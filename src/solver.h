@@ -6,6 +6,7 @@
 #include <limits>
 #include <cmath>
 #include <algorithm>
+#include "../include/config.h"
 
 constexpr double ZERO = 1e-9;
 constexpr double INFTY = 1e20;
@@ -13,7 +14,7 @@ constexpr double DWELL_FLAG = -2;
 
 class Solver {
 public:
-    Solver(const std::vector<std::vector<double>>& v_rel, const std::vector<std::vector<int>>& v_feasible, double dt);
+    Solver(const std::vector<std::vector<double>>& v_rel, const ProblemConfig& config);
     void solve();
     double (*running_cost)(int vi, double ri, int i, double dt);
     double (*sort_key)(double x);
@@ -21,8 +22,6 @@ public:
     static double simple_rounding(int vi, double ri, int i, double dt);
     std::vector<std::vector<double>> dwell_time_init;
     std::vector<std::pair<std::vector<int>, std::vector<double>>> dwell_time_cons;
-    template <typename T>
-    static void print_vector(const std::vector<T>& vec);
 
 private:
     std::vector<std::vector<double>> v_rel;
@@ -48,7 +47,6 @@ private:
     std::vector<double>
     dwell_time(std::pair<std::vector<int>, std::vector<double>> &con, std::vector<double> yi, int vi, int vni, int i) const;
 
-    static void print_vector();
 };
 
 #endif // SOLVER_H

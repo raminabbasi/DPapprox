@@ -2,14 +2,23 @@
 #include <stdexcept>
 #include <iostream>
 
-Solver::Solver(const std::vector<std::vector<double>>& v_rel, const std::vector<std::vector<int>>& v_feasible, double dt)
+Solver::Solver(const std::vector<std::vector<double>>& v_rel, const ProblemConfig& config)
         : v_rel(v_rel),
-        v_feasible(v_feasible),
-        dt(dt),
+        v_feasible(config.v_feasible),
+        dt(config.dt),
         dwell_time_init{},
-        dwell_time_cons{}{
-    running_cost = simple_rounding;
-    sort_key = [](double x){return x;};
+        dwell_time_cons{},
+        running_cost(simple_rounding),
+        sort_key([](double x){return x;}){
+    if (config.running_cost){
+        running_cost = config.running_cost;
+    }
+    if (config.sort_key){
+        sort_key = config.sort_key;
+    }
+    if (!config.dwell_time_cons.empty()){
+        dwell_time_cons = config.dwell_time_cons;
+    }
 }
 
 void Solver::solve() {
@@ -148,13 +157,4 @@ std::vector<double> Solver::dwell_time(std::pair<std::vector<int>, std::vector<d
         }
     }
     return yni;
-}
-
-template <typename T>
-void Solver::print_vector(const std::vector<T>& vec) {
-    std::cout << "[ ";
-    for (const auto& val : vec) {
-        std::cout << val << " ";
-    }
-    std::cout << "]\n";
 }
