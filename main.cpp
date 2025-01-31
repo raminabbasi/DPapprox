@@ -61,19 +61,23 @@ int main() {
     double dt = tf/N;
     double min_dwell_time = 0.3;
 
-    auto start = std::chrono::high_resolution_clock::now();
+
     Solver solver(v_rel, v_feasible, dt);
 
     solver.running_cost = running_cost;
     solver.sort_key = [](double x){return std::fabs(x); };
-    solver.dwell_time_cons = { {{-1}, {min_dwell_time}}};
+    solver.dwell_time_cons = { {{-1}, {min_dwell_time}}, {{0, 1} , {min_dwell_time}}};
 
+    auto start = std::chrono::high_resolution_clock::now();
     solver.solve();
-
     auto end = std::chrono::high_resolution_clock::now();
+    
     std::chrono::duration<double> elapsed = end - start;
 
     std::cout << "Optimal path: ";
+    for (int v : solver.solution.first){
+        std::cout << v << " ";
+    }
     write_csv("sol_trj.csv", solver.solution.first);
     std::cout << "\nFinal cost: " << solver.solution.second << std::endl;
     std::cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::microseconds > (end - start).count()<< " microseconds\n";

@@ -9,7 +9,7 @@
 
 constexpr double ZERO = 1e-9;
 constexpr double INFTY = 1e20;
-constexpr double DWELL_FLAG = -1;
+constexpr double DWELL_FLAG = -2;
 
 class Solver {
 public:
@@ -46,7 +46,7 @@ private:
     void set_timers();
 
     std::vector<double>
-    dwell_time(std::pair<std::vector<int>, std::vector<double>> &con, std::vector<double> &yi, int vi, int vni, int i);
+    dwell_time(std::pair<std::vector<int>, std::vector<double>> &con, std::vector<double> yi, int vi, int vni, int i) const;
 
     static void print_vector();
 };

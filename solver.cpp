@@ -21,16 +21,16 @@ void Solver::solve() {
     }
 
 
-    double cost;
-    double v;
-    int v_end;
-    double cost_end;
+    double cost(0);
+    double v(0);
+    int v_end(0);
+    double cost_end(0);
 
     for (int i = 0; i < N - 1; ++i) {
         for (int vni : v_feasible[i + 1]) {
             std::pair<int, int> v_nxt = {vni, i + 1};
 
-            double opt = INFTY;
+            double opt = std::numeric_limits<double>::infinity();
             double c = running_cost(vni, v_rel[i + 1][0], i + 1, dt);
             for (int vi : v_feasible[i]) {
                 std::pair<int, int> v_now = {vi, i};
@@ -43,7 +43,7 @@ void Solver::solve() {
                 }
 
                 bool violate_dwell = std::any_of(dwell.begin(), dwell.end(), [](const std::vector<double>& row) {
-                    return std::find(row.begin(), row.end(), -1.0) != row.end();
+                    return std::find(row.begin(), row.end(), DWELL_FLAG) != row.end();
                 });
 
                 double d = 0;
@@ -51,9 +51,12 @@ void Solver::solve() {
                     d = INFTY;
                 }
                 v = cost_to_go[v_now];
-                cost = c + v + d;
+                cost = (c + v + d);
 
                 if (sort_key(cost) < sort_key(opt)) {
+
+
+
                     opt = cost;
                     cost_to_go[v_nxt] = opt;
                     path_to_go[v_nxt] = vi;
@@ -116,11 +119,13 @@ void Solver::set_timers(){
     }
 }
 std::vector<double> Solver::dwell_time(std::pair<std::vector<int>, std::vector<double>>& con,
-                                       std::vector<double>& yi, int vi, int vni, int i){
+                                       std::vector<double> yi, int vi, int vni, int i) const{
     // Subtract dt from each element in yi
+
     for (double &y : yi) {
         y -= dt;
     }
+
     std::vector<double> yni = yi;
     for (size_t idx = 0; idx < yi.size(); ++idx) {
         if (yi[idx] <= 0) {
