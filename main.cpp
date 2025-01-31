@@ -48,11 +48,13 @@ double running_cost(int vi, double ri, int i, double dt){
     return (vi - ri) * dt;
 }
 
-int main() {
-
-    std::string filename = "trj.csv";  // Replace with your actual CSV file
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <data.csv>" << std::endl;
+        return EXIT_FAILURE;
+    }
+    std::string filename = argv[1];
     std::vector<std::vector<double>> v_rel = read_csv(filename);
-    //std::vector<std::vector<double>> v_rel = {{0.3, 0.4, 0.5}};
     std::vector<std::vector<int>> v_feasible(v_rel.size(), {1, 0, -1});
 
     std::size_t N = v_rel.size();
@@ -71,7 +73,7 @@ int main() {
     auto start = std::chrono::high_resolution_clock::now();
     solver.solve();
     auto end = std::chrono::high_resolution_clock::now();
-    
+
     std::chrono::duration<double> elapsed = end - start;
 
     std::cout << "Optimal path: ";
