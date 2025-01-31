@@ -7,12 +7,17 @@
 #include <cmath>
 #include <algorithm>
 
+constexpr double ZERO = 1e-9;
+constexpr double INFTY = 1e20;
+
 class Solver {
 public:
     Solver(const std::vector<std::vector<double>>& v_rel, const std::vector<std::vector<int>>& v_feasible, double dt);
     void solve();
-    double (*running_cost)(int vi, const std::vector<double>& ri, int i);
+    double (*running_cost)(int vi, double ri, int i, double dt);
+    double (*sort_key)(double x);
     std::pair<std::vector<int>, double> solution;
+    static double simple_rounding(int vi, double ri, int i, double dt);
 
 private:
     std::vector<std::vector<double>> v_rel;
@@ -30,8 +35,6 @@ private:
     std::unordered_map<std::pair<int, int>, int, pair_hash> path_to_go;
 
 
-    double sumup_rounding(int vi, const std::vector<double>& ri, int i) const;
 };
-double simple_rounding(int vi, const std::vector<double>& ri, int i);
-double zero_running(int vi, const std::vector<double>& ri, int i);
+
 #endif // SOLVER_H

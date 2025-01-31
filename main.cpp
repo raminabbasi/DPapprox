@@ -29,16 +29,24 @@ std::vector<std::vector<double>> read_csv(const std::string& filename) {
     return data;
 }
 
+double running_cost(int vi, double ri, int i, double dt){
+    return (vi - ri) * dt;
+}
+
 int main() {
 
     std::string filename = "trj.csv";  // Replace with your actual CSV file
     std::vector<std::vector<double>> v_rel = read_csv(filename);
     //std::vector<std::vector<double>> v_rel = {{0.3, 0.4, 0.5}};
     std::vector<std::vector<int>> v_feasible(v_rel.size(), {1, 0, -1});
-    double dt = 0.1;
+    double dt = 0.02;
 
     auto start = std::chrono::high_resolution_clock::now();
     Solver solver(v_rel, v_feasible, dt);
+
+    solver.running_cost = running_cost;
+    solver.sort_key = [](double x){return std::fabs(x); };
+
     solver.solve();
 
     auto end = std::chrono::high_resolution_clock::now();
