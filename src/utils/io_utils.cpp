@@ -28,13 +28,16 @@ std::vector<std::vector<double>> read_csv(const std::string& filename) {
     }
 
     std::string line;
-    if (std::getline(file, line)) {  // Read the single row
+    while (std::getline(file, line)) {  // Read each line (row)
+        std::vector<double> row;
         std::stringstream ss(line);
         std::string value;
 
-        while (std::getline(ss, value, ',')) {
-            data.push_back({std::stod(value)});  // Store each value as its own row
+        while (std::getline(ss, value, ',')) {  // Read each column (value)
+            row.push_back(std::stod(value));
         }
+
+        data.push_back(row);  // Store the row in data
     }
 
     file.close();

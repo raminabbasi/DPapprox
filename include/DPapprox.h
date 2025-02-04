@@ -20,24 +20,25 @@ namespace  DPapprox {
 
         void solve();
 
-        double (*running_cost)(int vi, double ri, int i, double dt);
+        double (*running_cost)(int vi, std::vector<std::vector<double>> ri, int i, double dt);
 
         double (*sort_key)(double x);
 
         std::pair<std::vector<int>, double> solution;
 
-        static double simple_rounding(int vi, double ri, int i, double dt);
+        static double simple_rounding(int vi, std::vector<std::vector<double>> ri, int i, double dt);
 
         std::vector<std::vector<double>> dwell_time_init;
         std::vector<std::pair<std::vector<int>, std::vector<double>>> dwell_time_cons;
+        static std::vector<std::vector<double>> get_column(const std::vector<std::vector<double>>& v, size_t col_index);
 
     private:
         std::vector<std::vector<double>> v_rel;
         std::vector<std::vector<int>> v_feasible;
         double dt;
 
-        std::size_t N = v_rel.size();
-        std::size_t num_input = v_rel[0].size();
+        std::size_t N = v_rel[0].size();
+        std::size_t num_input = v_rel.size();
 
         struct pair_hash {
             template<class T1, class T2>
@@ -55,6 +56,7 @@ namespace  DPapprox {
         std::vector<double>
         dwell_time(std::pair<std::vector<int>, std::vector<double>> &con, std::vector<double> yi, int vi, int vni,
                    int i) const;
+
 
     };
 }

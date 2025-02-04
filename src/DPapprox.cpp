@@ -27,7 +27,7 @@ namespace DPapprox {
 
         for (int v_0: v_feasible[0]) {
             std::pair<int, int> v_ini = {v_0, 0};
-            cost_to_go[v_ini] = running_cost(v_0, v_rel[0][0], 0, dt);
+            cost_to_go[v_ini] = running_cost(v_0, get_column(v_rel, 0), 0, dt);
         }
 
 
@@ -41,7 +41,7 @@ namespace DPapprox {
                 std::pair<int, int> v_nxt = {vni, i + 1};
 
                 double opt = std::numeric_limits<double>::infinity();
-                double c = running_cost(vni, v_rel[i + 1][0], i + 1, dt);
+                double c = running_cost(vni, get_column(v_rel, i+1), i + 1, dt);
                 for (int vi: v_feasible[i]) {
                     std::pair<int, int> v_now = {vi, i};
 
@@ -108,9 +108,9 @@ namespace DPapprox {
 
     }
 
-    double Solver::simple_rounding(int vi, double ri, int i, double dt) {
+    double Solver::simple_rounding(int vi, std::vector<std::vector<double>> ri, int i, double dt) {
         double sum;
-        sum = std::pow(vi - ri, 2);
+        sum = std::pow(vi - ri[0][0], 2);
         return std::sqrt(sum);
     }
 
@@ -159,4 +159,16 @@ namespace DPapprox {
         }
         return yni;
     }
+
+    std::vector<std::vector<double>> Solver::get_column(const std::vector<std::vector<double>> &v, size_t col_index) {
+        std::vector<std::vector<double>> column;
+        for (const auto& row : v) {
+            if (col_index < row.size()) {
+                column.push_back({row[col_index]});
+            }
+        }
+        return column;
+    }
+
+
 }
