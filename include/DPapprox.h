@@ -14,19 +14,19 @@ namespace  DPapprox {
     constexpr double INFTY = 1e20;
     constexpr double DWELL_FLAG = -2;
 
+
     class Solver {
     public:
         Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config);
 
         void solve();
 
-        double (*running_cost)(int vi, std::vector<std::vector<double>> ri, int i, double dt);
-
+        double (*running_cost)(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt);
         double (*sort_key)(double x);
 
-        std::pair<std::vector<int>, double> solution;
+        std::pair<std::vector<ProblemConfig::vtype>, double> solution;
 
-        static double simple_rounding(int vi, std::vector<std::vector<double>> ri, int i, double dt);
+        static double simple_rounding(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt);
 
         std::vector<std::vector<double>> dwell_time_init;
         std::vector<std::pair<std::vector<int>, std::vector<double>>> dwell_time_cons;
@@ -34,7 +34,7 @@ namespace  DPapprox {
 
     private:
         std::vector<std::vector<double>> v_rel;
-        std::vector<std::vector<int>> v_feasible;
+        std::vector<std::vector<ProblemConfig::vtype>> v_feasible;
         double dt;
 
         std::size_t N = v_rel[0].size();
@@ -42,19 +42,28 @@ namespace  DPapprox {
 
         struct pair_hash {
             template<class T1, class T2>
-            std::size_t operator()(const std::pair<T1, T2> &p) const {
-                return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
+            std::size_t operator()(const std::pair<T1, T2>& p) const {
+                return hash_vector(p.first) ^ std::hash<T2>()(p.second);
+            }
+
+        private:
+            static std::size_t hash_vector(const std::vector<int>& v) {
+                std::size_t seed = v.size();
+                for (int num : v) {
+                    seed ^= std::hash<int>()(num) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+                }
+                return seed;
             }
         };
 
-        std::vector<std::unordered_map<std::pair<int, int>, std::vector<double>, pair_hash>> timers;
-        std::unordered_map<std::pair<int, int>, double, pair_hash> cost_to_go;
-        std::unordered_map<std::pair<int, int>, int, pair_hash> path_to_go;
+        std::vector<std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash>> timers;
+        std::unordered_map<std::pair<ProblemConfig::vtype, int>, double, pair_hash> cost_to_go;
+        std::unordered_map<std::pair<ProblemConfig::vtype, int>, ProblemConfig::vtype, pair_hash> path_to_go;
 
         void set_timers();
 
         std::vector<double>
-        dwell_time(std::pair<std::vector<int>, std::vector<double>> &con, std::vector<double> yi, int vi, int vni,
+        dwell_time(std::pair<std::vector<int>, std::vector<double>> &con, std::vector<double> yi, const ProblemConfig::vtype& vi, const ProblemConfig::vtype& vni,
                    int i) const;
 
 
