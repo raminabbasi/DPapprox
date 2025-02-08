@@ -1,5 +1,4 @@
-#include "../include/DPapprox.h"
-#include <stdexcept>
+#include "DPapprox.h"
 
 namespace DPapprox {
 
@@ -19,34 +18,6 @@ namespace DPapprox {
         }
         if (!config.dwell_time_cons.empty()) {
             dwell_time_cons = config.dwell_time_cons;
-        }
-    }
-
-    // Overload + for vector addition with broadcasting
-    std::vector<double> operator+(const std::vector<double>& c, const std::vector<double>& d) {
-        if (c.size() == d.size()) {
-            // Case 1: Element-wise addition (same size)
-            std::vector<double> result(c.size());
-            for (size_t i = 0; i < c.size(); ++i) {
-                result[i] = c[i] + d[i];
-            }
-            return result;
-        } else if (c.size() == 1) {
-            // Case 2: Broadcast c (single element) over d
-            std::vector<double> result(d.size());
-            for (size_t i = 0; i < d.size(); ++i) {
-                result[i] = c[0] + d[i];
-            }
-            return result;
-        } else if (d.size() == 1) {
-            // Case 3: Broadcast d (single element) over c
-            std::vector<double> result(c.size());
-            for (size_t i = 0; i < c.size(); ++i) {
-                result[i] = c[i] + d[0];
-            }
-            return result;
-        } else {
-            throw std::runtime_error("Vector addition error: incompatible sizes.");
         }
     }
 
@@ -135,7 +106,7 @@ namespace DPapprox {
 
     }
 
-    std::vector<double> Solver::simple_rounding(const ProblemConfig::vtype& vi, std::vector<double> ri, int i, double dt) {
+    std::vector<double> Solver::simple_rounding(const ProblemConfig::vtype& vi, const std::vector<double>& ri, int i, double dt) {
         double sum;
         sum = std::pow(vi[0] - ri[0], 2);
         return {std::sqrt(sum)};

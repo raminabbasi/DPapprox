@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -DNDEBUG")
 
 # Create library
-add_library(DPapprox STATIC src/DPapprox.cpp src/utils/io_utils.cpp)
+add_library(DPapprox STATIC src/DPapprox.cpp src/utils/io_utils.cpp src/utils/vector_ops.cpp)
 
 # Public include directory
 target_include_directories(DPapprox PUBLIC

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "config.h"
 #include "io_utils.h"
+#include "vector_ops.h"
 
 namespace  DPapprox {
     constexpr double ZERO = 1e-9;
@@ -21,12 +22,12 @@ namespace  DPapprox {
 
         void solve();
 
-        std::vector<double> (*running_cost)(const ProblemConfig::vtype& vi, std::vector<double> ri, int i, double dt);
+        std::vector<double> (*running_cost)(const ProblemConfig::vtype& vi, const std::vector<double>& ri, int i, double dt);
         double (*sort_key)(const std::vector<double>& x);
 
         std::pair<std::vector<ProblemConfig::vtype>, double> solution;
 
-        static std::vector<double> simple_rounding(const ProblemConfig::vtype& vi, std::vector<double> ri, int i, double dt);
+        static std::vector<double> simple_rounding(const ProblemConfig::vtype& vi, const std::vector<double>& ri, int i, double dt);
 
         std::vector<std::vector<double>> dwell_time_init;
         std::vector<std::pair<std::vector<int>, std::vector<double>>> dwell_time_cons;
@@ -47,10 +48,10 @@ namespace  DPapprox {
             }
 
         private:
-            static std::size_t hash_vector(const std::vector<int>& v) {
+            static std::size_t hash_vector(const std::vector<double>& v) {
                 std::size_t seed = v.size();
-                for (int num : v) {
-                    seed ^= std::hash<int>()(num) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+                for (double num : v) {
+                    seed ^= std::hash<double>()(num) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
                 }
                 return seed;
             }
@@ -68,5 +69,6 @@ namespace  DPapprox {
 
 
     };
+
 }
 #endif // DPAPPROX_H
