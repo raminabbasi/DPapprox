@@ -4,13 +4,13 @@
 namespace DPapprox {
 
     Solver::Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config)
-            : v_rel(v_rel),
-              v_feasible(config.v_feasible),
-              dt(config.dt),
-              dwell_time_init{},
-              dwell_time_cons{},
-              running_cost(simple_rounding),
-              sort_key([](double x) { return x; }) {
+        : v_rel(v_rel),
+          v_feasible(config.v_feasible),
+          dt(config.dt),
+          dwell_time_init{},
+          dwell_time_cons{},
+          running_cost(simple_rounding),
+          sort_key([](const std::vector<double>& x) { return x.at(0); }) {
         if (config.running_cost) {
             running_cost = config.running_cost;
         }
@@ -19,6 +19,34 @@ namespace DPapprox {
         }
         if (!config.dwell_time_cons.empty()) {
             dwell_time_cons = config.dwell_time_cons;
+        }
+    }
+
+    // Overload + for vector addition with broadcasting
+    std::vector<double> operator+(const std::vector<double>& c, const std::vector<double>& d) {
+        if (c.size() == d.size()) {
+            // Case 1: Element-wise addition (same size)
+            std::vector<double> result(c.size());
+            for (size_t i = 0; i < c.size(); ++i) {
+                result[i] = c[i] + d[i];
+            }
+            return result;
+        } else if (c.size() == 1) {
+            // Case 2: Broadcast c (single element) over d
+            std::vector<double> result(d.size());
+            for (size_t i = 0; i < d.size(); ++i) {
+                result[i] = c[0] + d[i];
+            }
+            return result;
+        } else if (d.size() == 1) {
+            // Case 3: Broadcast d (single element) over c
+            std::vector<double> result(c.size());
+            for (size_t i = 0; i < c.size(); ++i) {
+                result[i] = c[i] + d[0];
+            }
+            return result;
+        } else {
+            throw std::runtime_error("Vector addition error: incompatible sizes.");
         }
     }
 
@@ -31,17 +59,17 @@ namespace DPapprox {
         }
 
 
-        double cost(0);
-        double v(0);
+        std::vector<double> cost{0};
+        std::vector<double> v{0};
         ProblemConfig::vtype v_end(0);
-        double cost_end(0);
+        std::vector<double> cost_end(0);
 
         for (int i = 0; i < N - 1; ++i) {
             for (const ProblemConfig::vtype& vni: v_feasible[i + 1]) {
                 std::pair<ProblemConfig::vtype, int> v_nxt = {vni, i + 1};
 
-                double opt = std::numeric_limits<double>::infinity();
-                double c = running_cost(vni, get_column(v_rel, i+1), i + 1, dt);
+                std::vector<double> opt = {std::numeric_limits<double>::infinity()};
+                std::vector<double> c = running_cost(vni, get_column(v_rel, i+1), i + 1, dt);
                 for (const ProblemConfig::vtype& vi: v_feasible[i]) {
                     std::pair<ProblemConfig::vtype, int> v_now = {vi, i};
 
@@ -56,7 +84,7 @@ namespace DPapprox {
                         return std::find(row.begin(), row.end(), DWELL_FLAG) != row.end();
                     });
 
-                    double d = 0;
+                    std::vector<double> d = {0};
                     if (violate_dwell) {
                         d = INFTY;
                     }
@@ -64,7 +92,6 @@ namespace DPapprox {
                     cost = (c + v + d);
 
                     if (sort_key(cost) < sort_key(opt)) {
-
 
                         opt = cost;
                         cost_to_go[v_nxt] = opt;
@@ -91,7 +118,7 @@ namespace DPapprox {
             auto it = cost_to_go.find(key);
             if (it != cost_to_go.end()) {
                 if (sort_key(it->second) < sort_key(cost_end)) {
-                    cost_end = sort_key(it->second);
+                    cost_end = it->second;
                     v_end = key.first;
                 }
             }
@@ -104,14 +131,14 @@ namespace DPapprox {
             optimum_path.insert(optimum_path.begin(), next_vi);
         }
         solution.first = optimum_path;
-        solution.second = cost_end;
+        solution.second = cost_end.at(0);
 
     }
 
-    double Solver::simple_rounding(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt) {
+    std::vector<double> Solver::simple_rounding(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt) {
         double sum;
         sum = std::pow(vi[0] - ri[0][0], 2);
-        return std::sqrt(sum);
+        return {std::sqrt(sum)};
     }
 
     void Solver::set_timers() {
@@ -170,6 +197,5 @@ namespace DPapprox {
         }
         return column;
     }
-
 
 }

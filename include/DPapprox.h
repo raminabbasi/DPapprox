@@ -11,7 +11,7 @@
 
 namespace  DPapprox {
     constexpr double ZERO = 1e-9;
-    constexpr double INFTY = 1e20;
+    const std::vector<double> INFTY {1e20};
     constexpr double DWELL_FLAG = -2;
 
 
@@ -21,12 +21,12 @@ namespace  DPapprox {
 
         void solve();
 
-        double (*running_cost)(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt);
-        double (*sort_key)(double x);
+        std::vector<double> (*running_cost)(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt);
+        double (*sort_key)(const std::vector<double>& x);
 
         std::pair<std::vector<ProblemConfig::vtype>, double> solution;
 
-        static double simple_rounding(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt);
+        static std::vector<double> simple_rounding(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt);
 
         std::vector<std::vector<double>> dwell_time_init;
         std::vector<std::pair<std::vector<int>, std::vector<double>>> dwell_time_cons;
@@ -57,7 +57,7 @@ namespace  DPapprox {
         };
 
         std::vector<std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash>> timers;
-        std::unordered_map<std::pair<ProblemConfig::vtype, int>, double, pair_hash> cost_to_go;
+        std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash> cost_to_go;
         std::unordered_map<std::pair<ProblemConfig::vtype, int>, ProblemConfig::vtype, pair_hash> path_to_go;
 
         void set_timers();
