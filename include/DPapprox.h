@@ -21,16 +21,16 @@ namespace  DPapprox {
 
         void solve();
 
-        std::vector<double> (*running_cost)(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt);
+        std::vector<double> (*running_cost)(const ProblemConfig::vtype& vi, std::vector<double> ri, int i, double dt);
         double (*sort_key)(const std::vector<double>& x);
 
         std::pair<std::vector<ProblemConfig::vtype>, double> solution;
 
-        static std::vector<double> simple_rounding(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt);
+        static std::vector<double> simple_rounding(const ProblemConfig::vtype& vi, std::vector<double> ri, int i, double dt);
 
         std::vector<std::vector<double>> dwell_time_init;
         std::vector<std::pair<std::vector<int>, std::vector<double>>> dwell_time_cons;
-        static std::vector<std::vector<double>> get_column(const std::vector<std::vector<double>>& v, size_t col_index);
+        static std::vector<double> get_column(const std::vector<std::vector<double>>& v, size_t col_index);
 
     private:
         std::vector<std::vector<double>> v_rel;

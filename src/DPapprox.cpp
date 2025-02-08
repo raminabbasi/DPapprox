@@ -135,9 +135,9 @@ namespace DPapprox {
 
     }
 
-    std::vector<double> Solver::simple_rounding(const ProblemConfig::vtype& vi, std::vector<std::vector<double>> ri, int i, double dt) {
+    std::vector<double> Solver::simple_rounding(const ProblemConfig::vtype& vi, std::vector<double> ri, int i, double dt) {
         double sum;
-        sum = std::pow(vi[0] - ri[0][0], 2);
+        sum = std::pow(vi[0] - ri[0], 2);
         return {std::sqrt(sum)};
     }
 
@@ -188,8 +188,8 @@ namespace DPapprox {
         return yni;
     }
 
-    std::vector<std::vector<double>> Solver::get_column(const std::vector<std::vector<double>> &v, size_t col_index) {
-        std::vector<std::vector<double>> column;
+    std::vector<double> Solver::get_column(const std::vector<std::vector<double>> &v, size_t col_index) {
+        std::vector<double> column;
         for (const auto& row : v) {
             if (col_index < row.size()) {
                 column.push_back({row[col_index]});
