@@ -31,7 +31,7 @@ namespace DPapprox {
     }
 
     // Overload `operator-` for `vtype - std::vector<double>`
-    std::vector<double> operator-(const ProblemConfig::vtype &a, std::vector<double> b) {
+    std::vector<double> operator-(const ProblemConfig::vtype &a, const std::vector<double>& b) {
         if (a.size() != b.size()) {
             throw std::runtime_error("Vector subtraction error: size mismatch.");
         }
