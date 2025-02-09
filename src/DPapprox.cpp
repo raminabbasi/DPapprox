@@ -1,7 +1,7 @@
 #include "DPapprox.h"
+#include "logger.h"
 
 namespace DPapprox {
-
     Solver::Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config)
         : v_rel(v_rel),
           v_feasible(config.v_feasible),
@@ -10,6 +10,8 @@ namespace DPapprox {
           dwell_time_cons{},
           running_cost(simple_rounding),
           sort_key([](const std::vector<double>& x) { return x.at(0); }) {
+        Log(INFO) << "Initializing Solver.";
+
         if (config.running_cost) {
             running_cost = config.running_cost;
         }
@@ -22,6 +24,7 @@ namespace DPapprox {
     }
 
     void Solver::solve() {
+        Log(INFO) << "Solving ...";
         set_timers();
 
         for (const ProblemConfig::vtype& v_0: v_feasible[0]) {
@@ -34,7 +37,7 @@ namespace DPapprox {
         std::vector<double> v{0};
         ProblemConfig::vtype v_end(0);
         std::vector<double> cost_end(0);
-
+        Log(INFO) << "Starting the forward recursion";
         for (int i = 0; i < N - 1; ++i) {
             for (const ProblemConfig::vtype& vni: v_feasible[i + 1]) {
                 std::pair<ProblemConfig::vtype, int> v_nxt = {vni, i + 1};
@@ -63,7 +66,6 @@ namespace DPapprox {
                     cost = (c + v + d);
 
                     if (sort_key(cost) < sort_key(opt)) {
-
                         opt = cost;
                         cost_to_go[v_nxt] = opt;
                         path_to_go[v_nxt] = vi;
@@ -78,6 +80,7 @@ namespace DPapprox {
             }
         }
 
+        Log(INFO) << "Finished the forward recursion";
         std::vector<std::pair<ProblemConfig::vtype, int>> keys;
         for (const ProblemConfig::vtype& val: v_feasible[0]) {
             keys.emplace_back(val, N - 1);
@@ -96,11 +99,12 @@ namespace DPapprox {
         }
 
         std::vector<ProblemConfig::vtype> optimum_path = {v_end};
-
+        Log(INFO) << "Starting the backward recursion";
         for (auto i = N - 1; i > 0; --i) {
             ProblemConfig::vtype next_vi = path_to_go[{optimum_path[0], i}];
             optimum_path.insert(optimum_path.begin(), next_vi);
         }
+        Log(INFO) << "Finished the backward recursion";
         solution.first = optimum_path;
         solution.second = cost_end.at(0);
 

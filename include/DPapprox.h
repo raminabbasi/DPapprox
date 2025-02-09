@@ -9,6 +9,7 @@
 #include "config.h"
 #include "io_utils.h"
 #include "vector_ops.h"
+#include "logger.h"
 
 namespace  DPapprox {
     constexpr double ZERO = 1e-9;
