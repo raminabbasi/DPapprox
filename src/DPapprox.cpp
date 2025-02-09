@@ -63,9 +63,11 @@ namespace DPapprox {
                         d = INFTY;
                     }
                     v = cost_to_go[v_now];
+
                     cost = (c + v + d);
 
                     if (sort_key(cost) < sort_key(opt)) {
+
                         opt = cost;
                         cost_to_go[v_nxt] = opt;
                         path_to_go[v_nxt] = vi;
@@ -138,7 +140,6 @@ namespace DPapprox {
         for (double &y: yi) {
             y -= dt;
         }
-
         std::vector<double> yni = yi;
         for (size_t idx = 0; idx < yi.size(); ++idx) {
             if (yi[idx] <= 0) {

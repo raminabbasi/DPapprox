@@ -40,7 +40,7 @@ namespace  DPapprox {
         double dt;
 
         std::size_t N = v_rel[0].size();
-        std::size_t num_input = v_rel.size();
+        std::size_t num_input = v_feasible[0][0].size();
 
         struct pair_hash {
             template<class T1, class T2>
