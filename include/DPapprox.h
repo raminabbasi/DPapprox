@@ -4,7 +4,6 @@
 #include <vector>
 #include <unordered_map>
 #include <limits>
-#include <cmath>
 #include <algorithm>
 #include "config.h"
 #include "io_utils.h"
@@ -23,27 +22,7 @@ namespace  DPapprox {
 
         void solve();
 
-        std::vector<double> (*next_state_f)(const ProblemConfig::xtype& xi,
-                                            const ProblemConfig::vtype& vi,
-                                            int i, double dt);
-
-        std::vector<double> (*running_cost)(const ProblemConfig::vtype& vi,
-                                            const std::vector<double>& ri, int i, double dt);
-
-        std::vector<double> (*dynamic_cost)(const ProblemConfig::xtype& xi,
-                                            const std::vector<double>& ri, int i, double dt);
-
-        double (*sort_key)(const std::vector<double>& x);
-        static std::vector<double> simple_rounding(const ProblemConfig::vtype& vi,
-                                                   const std::vector<double>& ri,
-                                                   int i, double dt);
-
-        static std::vector<double> next_state_0(const ProblemConfig::xtype& xi,
-                                                const ProblemConfig::vtype& vi,
-                                                int i, double dt);
-
         std::vector<std::vector<double>> dwell_time_init{};
-        std::vector<std::pair<std::vector<int>, std::vector<double>>> dwell_time_cons{};
 
         std::pair<std::vector<ProblemConfig::vtype>, double> solution;
 

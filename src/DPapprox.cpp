@@ -5,10 +5,7 @@ namespace DPapprox {
 
     Solver::Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config):
         v_rel(v_rel),
-        problem(config),
-        next_state_f(next_state_0),
-        running_cost(simple_rounding),
-        sort_key([](const std::vector<double>& x) { return x.at(0); })
+        problem(config)
         {
         Log(INFO) << "Initializing Solver.";
 
@@ -18,18 +15,6 @@ namespace DPapprox {
         if (problem.nv != static_cast<int>(problem.v_feasible[0][0].size())){
             throw std::runtime_error("Error: problem.nv does not match problem.v_feasible[0][0].size().");
         }
-        if (config.next_state_f) {
-            next_state_f = config.next_state_f;
-        }
-        if (config.running_cost) {
-            running_cost = config.running_cost;
-        }
-        if (config.sort_key) {
-            sort_key = config.sort_key;
-        }
-        if (!config.dwell_time_cons.empty()) {
-            dwell_time_cons = config.dwell_time_cons;
-        }
     }
 
     void Solver::solve() {
@@ -38,8 +23,8 @@ namespace DPapprox {
 
         for (const ProblemConfig::vtype& v_0: problem.v_feasible[0]) {
             std::pair<ProblemConfig::vtype, int> v_ini = {v_0, 0};
-            cost_to_go[v_ini] = running_cost(v_0, get_column(v_rel, 0), 0, problem.dt);
-            if (problem.is_dynamic_cost) next_state[v_ini] = next_state_f(problem.x0, v_0, 0, problem.dt);
+            cost_to_go[v_ini] = problem.running_cost(v_0, get_column(v_rel, 0), 0, problem.dt);
+            if (problem.is_dynamic_cost) next_state[v_ini] = problem.next_state_f(problem.x0, v_0, 0, problem.dt);
 
         }
 
@@ -55,14 +40,14 @@ namespace DPapprox {
                 std::pair<ProblemConfig::vtype, int> v_nxt = {vni, i + 1};
 
                 std::vector<double> opt = {std::numeric_limits<double>::infinity()};
-                std::vector<double> c = running_cost(vni, get_column(v_rel, i+1), i + 1, problem.dt);
+                std::vector<double> c = problem.running_cost(vni, get_column(v_rel, i+1), i + 1, problem.dt);
                 for (const ProblemConfig::vtype& vi: problem.v_feasible[i]) {
                     std::pair<ProblemConfig::vtype, int> v_now = {vi, i};
 
 
                     std::vector<std::vector<double>> dwell;
-                    for (size_t k = 0; k < dwell_time_cons.size(); ++k) {
-                        auto &con = dwell_time_cons[k];
+                    for (size_t k = 0; k < problem.dwell_time_cons.size(); ++k) {
+                        auto &con = problem.dwell_time_cons[k];
                         auto &timer = timers[k];
                         dwell.push_back(dwell_time(con, timer[v_now], vi, vni, i));
                     }
@@ -85,13 +70,13 @@ namespace DPapprox {
 
                     cost = (c + v + d + p);
 
-                    if (sort_key(cost) < sort_key(opt)) {
+                    if (problem.sort_key(cost) < problem.sort_key(opt)) {
 
                         opt = cost;
                         cost_to_go[v_nxt] = opt;
                         path_to_go[v_nxt] = vi;
 
-                        if (problem.is_dynamic_cost) next_state[v_nxt] = next_state_f(xni, vni, i + 1, problem.dt);
+                        if (problem.is_dynamic_cost) next_state[v_nxt] = problem.next_state_f(xni, vni, i + 1, problem.dt);
 
                         for (size_t k = 0; k < dwell.size(); ++k) {
                             auto &timer = timers[k];
@@ -114,7 +99,7 @@ namespace DPapprox {
         for (const auto &key: keys) {
             auto it = cost_to_go.find(key);
             if (it != cost_to_go.end()) {
-                if (sort_key(it->second) < sort_key(cost_end)) {
+                if (problem.sort_key(it->second) < problem.sort_key(cost_end)) {
                     cost_end = it->second;
                     v_end = key.first;
                 }
@@ -133,25 +118,9 @@ namespace DPapprox {
 
     }
 
-    std::vector<double> Solver::simple_rounding(const ProblemConfig::vtype& vi,
-                                                const std::vector<double>& ri,
-                                                int /*i*/,
-                                                double /*problem.dt*/) {
-        double sum;
-        sum = std::pow(vi[0] - ri[0], 2);
-        return {std::sqrt(sum)};
-    }
-
-    std::vector<double> Solver::next_state_0(const ProblemConfig::xtype& xi,
-                                     const ProblemConfig::vtype& /*vi*/,
-                                     int /*i*/,
-                                     double /*problem.dt*/){
-        return xi;
-    }
-
     void Solver::set_timers() {
         if (dwell_time_init.empty()) {
-            std::size_t num_cons = dwell_time_cons.size();
+            std::size_t num_cons = problem.dwell_time_cons.size();
             dwell_time_init.assign(num_cons, std::vector<double>(problem.nv, 0.0));
         }
         for (std::vector<double> &timer_0: dwell_time_init) {
