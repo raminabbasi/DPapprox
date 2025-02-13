@@ -11,19 +11,17 @@
 #include "logger.h"
 
 namespace  DPapprox {
+
     constexpr double ZERO = 1e-9;
     const std::vector<double> INFTY {1e20};
     constexpr double DWELL_FLAG = -2;
 
-
     class Solver {
+
     public:
         Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config);
 
         void solve();
-
-        std::vector<std::vector<double>> dwell_time_init{};
-
         std::pair<std::vector<ProblemConfig::vtype>, double> solution;
 
         static std::vector<double> get_column(const std::vector<std::vector<double>>& v, size_t col_index);
@@ -48,10 +46,15 @@ namespace  DPapprox {
             }
         };
 
-        std::vector<std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash>> timers;
-        std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash> cost_to_go;
-        std::unordered_map<std::pair<ProblemConfig::vtype, int>, ProblemConfig::vtype, pair_hash> path_to_go;
-        std::unordered_map<std::pair<ProblemConfig::vtype, int>, ProblemConfig::vtype, pair_hash> next_state;
+        // Define type alias for readability
+        using KeyType = std::pair<ProblemConfig::vtype, int>;
+        using CostMap = std::unordered_map<KeyType, std::vector<double>, pair_hash>;
+        using PathMap = std::unordered_map<KeyType, ProblemConfig::vtype, pair_hash>;
+
+        std::vector<CostMap> timers;
+        CostMap cost_to_go;
+        PathMap path_to_go;
+        PathMap next_state;
 
         void set_timers();
 

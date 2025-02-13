@@ -31,7 +31,7 @@ namespace DPapprox {
         ProblemConfig::xtype xni{dp.x0};
         ProblemConfig::vtype v_end(0);
         std::vector<double> cost_end(0);
-        Log(INFO) << "Starting the forward recursion";
+        //Log(INFO) << "Starting the forward recursion";
         for (int i = 0; i < dp.N - 1; ++i) {
             for (const ProblemConfig::vtype& vni: dp.v_feasible[i + 1]) {
                 std::pair<ProblemConfig::vtype, int> v_nxt = {vni, i + 1};
@@ -85,7 +85,7 @@ namespace DPapprox {
             }
         }
 
-        Log(INFO) << "Finished the forward recursion";
+        //Log(INFO) << "Finished the forward recursion";
         std::vector<std::pair<ProblemConfig::vtype, int>> keys;
         for (const ProblemConfig::vtype& val: dp.v_feasible[0]) {
             keys.emplace_back(val, dp.N - 1);
@@ -104,23 +104,23 @@ namespace DPapprox {
         }
 
         std::vector<ProblemConfig::vtype> optimum_path = {v_end};
-        Log(INFO) << "Starting the backward recursion";
+        //Log(INFO) << "Starting the backward recursion";
         for (auto i = dp.N - 1; i > 0; --i) {
             ProblemConfig::vtype next_vi = path_to_go[{optimum_path[0], i}];
             optimum_path.insert(optimum_path.begin(), next_vi);
         }
-        Log(INFO) << "Finished the backward recursion";
+        //Log(INFO) << "Finished the backward recursion";
         solution.first = optimum_path;
         solution.second = cost_end.at(0);
 
     }
 
     void Solver::set_timers() {
-        if (dwell_time_init.empty()) {
+        if (dp.dwell_time_init.empty()) {
             std::size_t num_cons = dp.dwell_time_cons.size();
-            dwell_time_init.assign(num_cons, std::vector<double>(dp.v_feasible[0][0].size(), 0.0));
+            dp.dwell_time_init.assign(num_cons, std::vector<double>(dp.v_feasible[0][0].size(), 0.0));
         }
-        for (std::vector<double> &timer_0: dwell_time_init) {
+        for (std::vector<double> &timer_0: dp.dwell_time_init) {
             std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash> timer;
             for (const ProblemConfig::vtype& v_0: dp.v_feasible[0]) {
                 timer[{v_0, 0}] = timer_0;

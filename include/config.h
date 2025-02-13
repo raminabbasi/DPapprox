@@ -22,6 +22,7 @@ struct ProblemConfig {
     std::vector<double> (*dynamic_cost)(const xtype& xi, const std::vector<double>& ri, int i, double dt){dynamic_cost_0};
 
     std::vector<std::pair<std::vector<int>, std::vector<double>>>dwell_time_cons;
+    std::vector<std::vector<double>> dwell_time_init{};
 
     static std::vector<double> running_cost_0(const vtype& vi, const std::vector<double>& ri, int, double){
         double sum;
