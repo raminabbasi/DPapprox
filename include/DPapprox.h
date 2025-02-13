@@ -50,16 +50,8 @@ namespace  DPapprox {
         static std::vector<double> get_column(const std::vector<std::vector<double>>& v, size_t col_index);
 
     private:
+        ProblemConfig problem;
         std::vector<std::vector<double>> v_rel;
-        std::vector<std::vector<ProblemConfig::vtype>> v_feasible;
-        double dt;
-        ProblemConfig::xtype x0;
-        bool is_dynamic_cost;
-
-        int N;
-        int nv;
-//        std::size_t N = v_rel[0].size();
-//        std::size_t num_input = v_feasible[0][0].size();
 
         struct pair_hash {
             template<class T1, class T2>
@@ -85,10 +77,11 @@ namespace  DPapprox {
         void set_timers();
 
         std::vector<double>
-        dwell_time(std::pair<std::vector<int>, std::vector<double>> &con, std::vector<double> yi, const ProblemConfig::vtype& vi, const ProblemConfig::vtype& vni,
-                   int i) const;
-
-
+        dwell_time(std::pair<std::vector<int>,
+                   std::vector<double>> &con,
+                   std::vector<double> yi,
+                   const ProblemConfig::vtype& vi,
+                   const ProblemConfig::vtype& vni, int i) const;
     };
 
 }
