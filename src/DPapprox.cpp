@@ -3,15 +3,21 @@
 
 namespace DPapprox {
     Solver::Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config)
-        : v_rel(v_rel),
-          v_feasible(config.v_feasible),
-          dt(config.dt),
-          dwell_time_init{},
-          dwell_time_cons{},
-          running_cost(simple_rounding),
+        : v_rel(v_rel), v_feasible(config.v_feasible), nv(config.nv), N(config.N),
+          dt(config.dt), x0(config.x0), is_dynamic_cost{config.is_dynamic_cost},
+          next_state_f(next_state_0), dynamic_cost(config.dynamic_cost), running_cost(simple_rounding),
           sort_key([](const std::vector<double>& x) { return x.at(0); }) {
         Log(INFO) << "Initializing Solver.";
 
+        if (N != static_cast<int>(v_rel[0].size())){
+            throw std::runtime_error("Error: N does not match v_rel[0].size().");
+        }
+        if (nv != static_cast<int>(v_feasible[0][0].size())){
+            throw std::runtime_error("Error: nv does not match v_feasible[0][0].size().");
+        }
+        if (config.next_state_f) {
+            next_state_f = config.next_state_f;
+        }
         if (config.running_cost) {
             running_cost = config.running_cost;
         }
@@ -30,11 +36,14 @@ namespace DPapprox {
         for (const ProblemConfig::vtype& v_0: v_feasible[0]) {
             std::pair<ProblemConfig::vtype, int> v_ini = {v_0, 0};
             cost_to_go[v_ini] = running_cost(v_0, get_column(v_rel, 0), 0, dt);
-        }
+            if (is_dynamic_cost) next_state[v_ini] = next_state_f(x0, v_0, 0, dt);
 
+        }
 
         std::vector<double> cost{0};
         std::vector<double> v{0};
+        std::vector<double> p{0};
+        ProblemConfig::xtype xni{x0};
         ProblemConfig::vtype v_end(0);
         std::vector<double> cost_end(0);
         Log(INFO) << "Starting the forward recursion";
@@ -47,10 +56,11 @@ namespace DPapprox {
                 for (const ProblemConfig::vtype& vi: v_feasible[i]) {
                     std::pair<ProblemConfig::vtype, int> v_now = {vi, i};
 
+
                     std::vector<std::vector<double>> dwell;
                     for (size_t k = 0; k < dwell_time_cons.size(); ++k) {
-                        auto &con = dwell_time_cons[k];  // Equivalent to "con" in Python
-                        auto &timer = timers[k];        // Equivalent to "timer" in Python
+                        auto &con = dwell_time_cons[k];
+                        auto &timer = timers[k];
                         dwell.push_back(dwell_time(con, timer[v_now], vi, vni, i));
                     }
 
@@ -62,15 +72,23 @@ namespace DPapprox {
                     if (violate_dwell) {
                         d = INFTY;
                     }
+
+                    if (is_dynamic_cost) {
+                        ProblemConfig::xtype xni = next_state[v_now];
+                        p = dynamic_cost(xni, get_column(v_rel, i), i, dt);
+                    }
+
                     v = cost_to_go[v_now];
 
-                    cost = (c + v + d);
+                    cost = (c + v + d + p);
 
                     if (sort_key(cost) < sort_key(opt)) {
 
                         opt = cost;
                         cost_to_go[v_nxt] = opt;
                         path_to_go[v_nxt] = vi;
+
+                        if (is_dynamic_cost) next_state[v_nxt] = next_state_f(xni, vni, i + 1, dt);
 
                         for (size_t k = 0; k < dwell.size(); ++k) {
                             auto &timer = timers[k];
@@ -112,16 +130,26 @@ namespace DPapprox {
 
     }
 
-    std::vector<double> Solver::simple_rounding(const ProblemConfig::vtype& vi, const std::vector<double>& ri, int i, double dt) {
+    std::vector<double> Solver::simple_rounding(const ProblemConfig::vtype& vi,
+                                                const std::vector<double>& ri,
+                                                int /*i*/,
+                                                double /*dt*/) {
         double sum;
         sum = std::pow(vi[0] - ri[0], 2);
         return {std::sqrt(sum)};
     }
 
+    std::vector<double> Solver::next_state_0(const ProblemConfig::xtype& xi,
+                                     const ProblemConfig::vtype& /*vi*/,
+                                     int /*i*/,
+                                     double /*dt*/){
+        return xi;
+    }
+
     void Solver::set_timers() {
         if (dwell_time_init.empty()) {
             std::size_t num_cons = dwell_time_cons.size();
-            dwell_time_init.assign(num_cons, std::vector<double>(num_input, 0.0));
+            dwell_time_init.assign(num_cons, std::vector<double>(nv, 0.0));
         }
         for (std::vector<double> &timer_0: dwell_time_init) {
             std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash> timer;
@@ -135,7 +163,6 @@ namespace DPapprox {
     std::vector<double> Solver::dwell_time(std::pair<std::vector<int>, std::vector<double>> &con,
                                            std::vector<double> yi, const ProblemConfig::vtype& vi,
                                            const ProblemConfig::vtype& vni, int i) const {
-        // Subtract dt from each element in yi
 
         for (double &y: yi) {
             y -= dt;

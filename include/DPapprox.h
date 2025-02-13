@@ -23,24 +23,43 @@ namespace  DPapprox {
 
         void solve();
 
-        std::vector<double> (*running_cost)(const ProblemConfig::vtype& vi, const std::vector<double>& ri, int i, double dt);
+        std::vector<double> (*next_state_f)(const ProblemConfig::xtype& xi,
+                                            const ProblemConfig::vtype& vi,
+                                            int i, double dt);
+
+        std::vector<double> (*running_cost)(const ProblemConfig::vtype& vi,
+                                            const std::vector<double>& ri, int i, double dt);
+
+        std::vector<double> (*dynamic_cost)(const ProblemConfig::xtype& xi,
+                                            const std::vector<double>& ri, int i, double dt);
+
         double (*sort_key)(const std::vector<double>& x);
+        static std::vector<double> simple_rounding(const ProblemConfig::vtype& vi,
+                                                   const std::vector<double>& ri,
+                                                   int i, double dt);
+
+        static std::vector<double> next_state_0(const ProblemConfig::xtype& xi,
+                                                const ProblemConfig::vtype& vi,
+                                                int i, double dt);
+
+        std::vector<std::vector<double>> dwell_time_init{};
+        std::vector<std::pair<std::vector<int>, std::vector<double>>> dwell_time_cons{};
 
         std::pair<std::vector<ProblemConfig::vtype>, double> solution;
 
-        static std::vector<double> simple_rounding(const ProblemConfig::vtype& vi, const std::vector<double>& ri, int i, double dt);
-
-        std::vector<std::vector<double>> dwell_time_init;
-        std::vector<std::pair<std::vector<int>, std::vector<double>>> dwell_time_cons;
         static std::vector<double> get_column(const std::vector<std::vector<double>>& v, size_t col_index);
 
     private:
         std::vector<std::vector<double>> v_rel;
         std::vector<std::vector<ProblemConfig::vtype>> v_feasible;
         double dt;
+        ProblemConfig::xtype x0;
+        bool is_dynamic_cost;
 
-        std::size_t N = v_rel[0].size();
-        std::size_t num_input = v_feasible[0][0].size();
+        int N;
+        int nv;
+//        std::size_t N = v_rel[0].size();
+//        std::size_t num_input = v_feasible[0][0].size();
 
         struct pair_hash {
             template<class T1, class T2>
@@ -61,6 +80,7 @@ namespace  DPapprox {
         std::vector<std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash>> timers;
         std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash> cost_to_go;
         std::unordered_map<std::pair<ProblemConfig::vtype, int>, ProblemConfig::vtype, pair_hash> path_to_go;
+        std::unordered_map<std::pair<ProblemConfig::vtype, int>, ProblemConfig::vtype, pair_hash> next_state;
 
         void set_timers();
 
