@@ -29,7 +29,7 @@ namespace  DPapprox {
         static std::vector<double> get_column(const std::vector<std::vector<double>>& v, size_t col_index);
 
     private:
-        ProblemConfig problem;
+        ProblemConfig dp;
         std::vector<std::vector<double>> v_rel;
 
         struct pair_hash {

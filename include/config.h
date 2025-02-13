@@ -11,7 +11,6 @@ struct ProblemConfig {
 
     double dt{1.0};
     int N{1};
-    int nv{1};
 
     std::vector<std::vector<vtype>> v_feasible;
     xtype x0;
