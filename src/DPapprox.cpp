@@ -41,7 +41,6 @@ namespace DPapprox {
                 for (const ProblemConfig::vtype& vi: dp.v_feasible[i]) {
                     std::pair<ProblemConfig::vtype, int> v_now = {vi, i};
 
-
                     std::vector<std::vector<double>> dwell;
                     for (size_t k = 0; k < dp.dwell_time_cons.size(); ++k) {
                         auto &con = dp.dwell_time_cons[k];
@@ -103,16 +102,23 @@ namespace DPapprox {
             }
         }
 
-        std::vector<ProblemConfig::vtype> optimum_path = {v_end};
+        std::vector<ProblemConfig::vtype> optimum_path {v_end};
+        std::vector<ProblemConfig::xtype> optimum_state {};
         //Log(INFO) << "Starting the backward recursion";
         for (auto i = dp.N - 1; i > 0; --i) {
-            ProblemConfig::vtype next_vi = path_to_go[{optimum_path[0], i}];
-            optimum_path.insert(optimum_path.begin(), next_vi);
+            optimum_path.insert(optimum_path.begin(), path_to_go[{optimum_path[0], i}]);
+            if (dp.is_dynamic_cost) optimum_state.insert(optimum_state.begin(), next_state[{optimum_path[0], i}]);
         }
-        //Log(INFO) << "Finished the backward recursion";
-        solution.first = optimum_path;
-        solution.second = cost_end.at(0);
 
+        solution.optimum_path = optimum_path;
+        solution.f = cost_end.at(0);
+
+        if (dp.is_dynamic_cost){
+            std::pair<ProblemConfig::vtype, int> v_ini = {optimum_path.at(0), 0};
+            optimum_state.insert(optimum_state.begin(), next_state[v_ini]);
+            optimum_state.insert(optimum_state.begin(), dp.x0);
+            solution.optimum_state = optimum_state;
+        }
     }
 
     void Solver::set_timers() {

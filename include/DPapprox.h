@@ -16,18 +16,19 @@ namespace  DPapprox {
     const std::vector<double> INFTY {1e20};
     constexpr double DWELL_FLAG = -2;
 
+    struct Solution {
+        std::vector<ProblemConfig::vtype> optimum_path;
+        std::vector<ProblemConfig::xtype> optimum_state;
+        double f;
+        bool success;
+    };
+
     class Solver {
 
     public:
         Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config);
         void solve();
-        std::pair<std::vector<ProblemConfig::vtype>, double> solution;
-//        struct Solution {
-//            ProblemConfig::vtype optimum_path;
-//            ProblemConfig::xtype optimum_state;
-//            double f;
-//            bool success;
-//        };
+        Solution solution;
 
 
     private:
