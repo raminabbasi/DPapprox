@@ -52,3 +52,13 @@ std::vector<std::vector<double>> read_csv(const std::string& filename) {
     file.close();
     return data;
 }
+
+std::vector<double> get_column(const std::vector<std::vector<double>> &v, size_t col_index) {
+    std::vector<double> column;
+    for (const auto& row : v) {
+        if (col_index < row.size()) {
+            column.push_back({row[col_index]});
+        }
+    }
+    return column;
+}

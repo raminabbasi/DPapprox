@@ -20,11 +20,15 @@ namespace  DPapprox {
 
     public:
         Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config);
-
         void solve();
         std::pair<std::vector<ProblemConfig::vtype>, double> solution;
+//        struct Solution {
+//            ProblemConfig::vtype optimum_path;
+//            ProblemConfig::xtype optimum_state;
+//            double f;
+//            bool success;
+//        };
 
-        static std::vector<double> get_column(const std::vector<std::vector<double>>& v, size_t col_index);
 
     private:
         ProblemConfig dp;

@@ -160,14 +160,4 @@ namespace DPapprox {
         return yni;
     }
 
-    std::vector<double> Solver::get_column(const std::vector<std::vector<double>> &v, size_t col_index) {
-        std::vector<double> column;
-        for (const auto& row : v) {
-            if (col_index < row.size()) {
-                column.push_back({row[col_index]});
-            }
-        }
-        return column;
-    }
-
 }
