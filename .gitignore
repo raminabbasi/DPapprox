@@ -1,4 +1,6 @@
 cmake-build-debug/
 build/
+examples/data/x_*
+examples/data/v_*
 .idea/
 **/_*

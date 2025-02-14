@@ -1,11 +1,20 @@
 cmake_minimum_required(VERSION 3.20)
+project(MyProject)
 
-# Define the project name for examples
-project(DPapproxExamples)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1 -march=native -DNDEBUG")
 
-# Find the main DPapprox library
-add_subdirectory(.. ${CMAKE_BINARY_DIR}/DPapprox)  # Link to the main library
+find_package(DPapprox REQUIRED)
 
-# Define an example executable
-add_executable(trj trj.cpp)
-target_link_libraries(trj PRIVATE DPapprox)
+function(add_problem_executable name)
+    add_executable(${name} src/${name}.cpp)
+    target_link_libraries(${name} DPapprox::DPapprox)
+endfunction()
+
+add_problem_executable(trj)
+add_problem_executable(simple)
+add_problem_executable(dtd)
+add_problem_executable(rck)
+add_problem_executable(rck_robust)
+add_problem_executable(run_all)
+

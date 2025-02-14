@@ -2,11 +2,9 @@
 #include <chrono>
 #include <vector>
 #include <string>
-#include <DPapprox.h>
-#include "casadi/casadi.hpp"
+#include "DPapprox.h"
 
 using namespace DPapprox;
-using namespace casadi;
 
 std::vector<double> running_cost(const ProblemConfig::vtype& vi,
                                  const std::vector<double>& ri,
