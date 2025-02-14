@@ -112,6 +112,7 @@ namespace DPapprox {
 
         solution.optimum_path = optimum_path;
         solution.f = cost_end.at(0);
+        solution.success = (solution.f < INFTY.at(0));
 
         if (dp.is_dynamic_cost){
             v_ini = {optimum_path.at(0), 0};
