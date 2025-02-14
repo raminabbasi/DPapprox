@@ -25,9 +25,7 @@ struct ProblemConfig {
     std::vector<std::vector<double>> dwell_time_init{};
 
     static std::vector<double> running_cost_0(const vtype& vi, const std::vector<double>& ri, int, double){
-        double sum;
-        sum = std::pow(vi[0] - ri[0], 2);
-        return std::vector<double>{std::sqrt(sum)};
+        return std::vector<double>{std::abs(vi[0] - ri[0])};
     };
     static double sort_key_0(const std::vector<double>& x){
         return x.at(0);

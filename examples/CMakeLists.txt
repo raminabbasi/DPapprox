@@ -16,4 +16,5 @@ add_problem_executable(simple)
 add_problem_executable(dtd)
 add_problem_executable(rck)
 add_problem_executable(rck_robust)
+add_problem_executable(run_all)
 

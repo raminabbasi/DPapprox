@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
     auto start = std::chrono::high_resolution_clock::now();
     solver.solve();
     auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "size of v_feasible" << config.v_feasible.size();
 
     std::cout << "Optimal path: ";
     for (const ProblemConfig::vtype& v : solver.solution.optimum_path){
