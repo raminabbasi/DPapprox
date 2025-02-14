@@ -18,6 +18,7 @@ function(add_problem_executable name)
     target_link_libraries(${name} DPapprox) # Link with the local library
 endfunction()
 
+add_problem_executable(mwe)
 add_problem_executable(trj)
 add_problem_executable(simple)
 add_problem_executable(dtd)

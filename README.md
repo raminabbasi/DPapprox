@@ -71,9 +71,48 @@ DPapprox can also keep track of system states. To do so, we set
 * `dynamic_cost(xi, vi, i, dt)`: A vector function that returns a dynamic cost as a function of the state `xi` of the system.
   * `max {0, h(x_i, t_i)}` can be used as a penalty function for a constraint `h(x_i, t_i) <= 0`.
   * Returning `\infty` penalty for a state constraint violation enforces that constraint. 
-* `i`
+* `include_state`: A boolean to indicate whether DPapprox should include states or not. Default is `false`.
 
+## Usage
+Below is a minimum working example.
+
+```c++
+#include "DPapprox.h"
+#include <vector>
+
+using namespace DPapprox;
+
+int main(){
+
+    ProblemConfig config;
+    std::vector<std::vector<double>> v_rel{{0.2, 0.8, 0.4}};
+
+    config.N = 3;
+    config.v_feasible = {{{0}, {1}}, {{0}, {1}}, {{0}, {1}}};
+
+    DPapprox::Solver solver(v_rel, config);
+    solver.solve();
+
+    for (auto& v : solver.solution.optimum_path){
+        std::cout << v[0] << " ";
+    }
+    std::cout << std::endl;
+    return 0;
+}
+
+```
 ## Citing
+```
+@software{DPapprox,
+author = {Abbasi-Esfeden, Ramin},
+license = {GPL-3.0},
+month = Feb,
+title = {DPapprox: Dynamic Programming-inspired discrete approximation algorithm},
+url = {https://github.com/raminabbasi/DPapprox},
+version = {0.1.0},
+year = {2025}
+}
+```
 
 
 ## Contributing
