@@ -18,30 +18,27 @@ namespace DPapprox {
         Log(INFO) << "Solving ...";
         set_timers();
 
+        std::pair<ProblemConfig::vtype, int> v_ini, v_now, v_nxt;
+        std::vector<double> opt, c{0}, v{0}, p{0}, d{0}, cost{0};
+        ProblemConfig::xtype xni{dp.x0};
+        std::vector<std::vector<double>> dwell;
+
         for (const ProblemConfig::vtype& v_0: dp.v_feasible[0]) {
-            std::pair<ProblemConfig::vtype, int> v_ini = {v_0, 0};
+            v_ini = {v_0, 0};
             cost_to_go[v_ini] = dp.running_cost(v_0, get_column(v_rel, 0), 0, dp.dt);
             if (dp.is_dynamic_cost) next_state[v_ini] = dp.next_state_f(dp.x0, v_0, 0, dp.dt);
-
         }
 
-        std::vector<double> cost{0};
-        std::vector<double> v{0};
-        std::vector<double> p{0};
-        ProblemConfig::xtype xni{dp.x0};
-        ProblemConfig::vtype v_end(0);
-        std::vector<double> cost_end(0);
-        //Log(INFO) << "Starting the forward recursion";
         for (int i = 0; i < dp.N - 1; ++i) {
             for (const ProblemConfig::vtype& vni: dp.v_feasible[i + 1]) {
-                std::pair<ProblemConfig::vtype, int> v_nxt = {vni, i + 1};
+                v_nxt = {vni, i + 1};
 
-                std::vector<double> opt = {std::numeric_limits<double>::infinity()};
-                std::vector<double> c = dp.running_cost(vni, get_column(v_rel, i+1), i + 1, dp.dt);
+                opt = {std::numeric_limits<double>::infinity()};
+                c = dp.running_cost(vni, get_column(v_rel, i+1), i + 1, dp.dt);
                 for (const ProblemConfig::vtype& vi: dp.v_feasible[i]) {
-                    std::pair<ProblemConfig::vtype, int> v_now = {vi, i};
+                    v_now = {vi, i};
 
-                    std::vector<std::vector<double>> dwell;
+                    dwell = {};
                     for (size_t k = 0; k < dp.dwell_time_cons.size(); ++k) {
                         auto &con = dp.dwell_time_cons[k];
                         auto &timer = timers[k];
@@ -52,13 +49,13 @@ namespace DPapprox {
                         return std::find(row.begin(), row.end(), DWELL_FLAG) != row.end();
                     });
 
-                    std::vector<double> d = {0};
+                    d = {0};
                     if (violate_dwell) {
                         d = INFTY;
                     }
 
                     if (dp.is_dynamic_cost) {
-                        ProblemConfig::xtype xni = next_state[v_now];
+                        xni = next_state[v_now];
                         p = dp.dynamic_cost(xni, get_column(v_rel, i), i, dp.dt);
                     }
 
@@ -72,7 +69,9 @@ namespace DPapprox {
                         cost_to_go[v_nxt] = opt;
                         path_to_go[v_nxt] = vi;
 
-                        if (dp.is_dynamic_cost) next_state[v_nxt] = dp.next_state_f(xni, vni, i + 1, dp.dt);
+                        if (dp.is_dynamic_cost){
+                            next_state[v_nxt] = dp.next_state_f(xni, vni, i + 1, dp.dt);
+                        }
 
                         for (size_t k = 0; k < dwell.size(); ++k) {
                             auto &timer = timers[k];
@@ -84,13 +83,13 @@ namespace DPapprox {
             }
         }
 
-        //Log(INFO) << "Finished the forward recursion";
         std::vector<std::pair<ProblemConfig::vtype, int>> keys;
         for (const ProblemConfig::vtype& val: dp.v_feasible[0]) {
             keys.emplace_back(val, dp.N - 1);
         }
 
-        cost_end = INFTY;
+        std::vector<double> cost_end{INFTY};
+        ProblemConfig::vtype v_end{0};
 
         for (const auto &key: keys) {
             auto it = cost_to_go.find(key);
@@ -104,17 +103,18 @@ namespace DPapprox {
 
         std::vector<ProblemConfig::vtype> optimum_path {v_end};
         std::vector<ProblemConfig::xtype> optimum_state {};
-        //Log(INFO) << "Starting the backward recursion";
         for (auto i = dp.N - 1; i > 0; --i) {
             optimum_path.insert(optimum_path.begin(), path_to_go[{optimum_path[0], i}]);
-            if (dp.is_dynamic_cost) optimum_state.insert(optimum_state.begin(), next_state[{optimum_path[0], i}]);
+            if (dp.is_dynamic_cost) {
+                optimum_state.insert(optimum_state.begin(), next_state[{optimum_path[0], i}]);
+            }
         }
 
         solution.optimum_path = optimum_path;
         solution.f = cost_end.at(0);
 
         if (dp.is_dynamic_cost){
-            std::pair<ProblemConfig::vtype, int> v_ini = {optimum_path.at(0), 0};
+            v_ini = {optimum_path.at(0), 0};
             optimum_state.insert(optimum_state.begin(), next_state[v_ini]);
             optimum_state.insert(optimum_state.begin(), dp.x0);
             solution.optimum_state = optimum_state;
@@ -126,8 +126,9 @@ namespace DPapprox {
             std::size_t num_cons = dp.dwell_time_cons.size();
             dp.dwell_time_init.assign(num_cons, std::vector<double>(dp.v_feasible[0][0].size(), 0.0));
         }
+
+        std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash> timer;
         for (std::vector<double> &timer_0: dp.dwell_time_init) {
-            std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash> timer;
             for (const ProblemConfig::vtype& v_0: dp.v_feasible[0]) {
                 timer[{v_0, 0}] = timer_0;
             }

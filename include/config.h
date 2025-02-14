@@ -18,7 +18,7 @@ struct ProblemConfig {
 
     std::function<std::vector<double>(const vtype&, const std::vector<double>&, int, double)> running_cost = running_cost_0;
     std::function<double(const std::vector<double>&)> sort_key = sort_key_0;
-    std::function<std::vector<double>(const xtype&, const vtype&, int, double)> next_state_f = next_state_f_0;
+    std::function<xtype(const xtype&, const vtype&, int, double)> next_state_f = next_state_f_0;
     std::function<std::vector<double>(const xtype&, const std::vector<double>&, int, double)> dynamic_cost = dynamic_cost_0;
 
     std::vector<std::pair<std::vector<int>, std::vector<double>>>dwell_time_cons;
