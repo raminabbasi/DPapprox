@@ -1,8 +1,6 @@
 #include "DPapprox.h"
 #include <vector>
 
-using namespace DPapprox;
-
 int main(){
 
     ProblemConfig config;

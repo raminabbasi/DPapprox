@@ -8,13 +8,12 @@ Solver::Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfi
     {
     Log(INFO) << "Initializing Solver.";
 
-    if (dp.N != static_cast<int>(v_rel[0].size())){
+    if (dp.N != static_cast<int>(v_rel[0].size()))
         throw std::runtime_error("Error: N does not match v_rel[0].size().");
-    }
 }
 
 void Solver::solve() {
-    Log(INFO) << "Solving ...";
+    Log(INFO) << "Solving...";
     set_timers();
 
     std::pair<ProblemConfig::vtype, int> v_ini, v_now, v_nxt;
@@ -50,9 +49,9 @@ void Solver::solve() {
                 });
 
                 d = {0};
-                if (violate_dwell) {
+                if (violate_dwell)
                     d = INFTY;
-                }
+
 
                 if (dp.include_state) {
                     xni = next_state[v_now];
@@ -69,9 +68,9 @@ void Solver::solve() {
                     cost_to_go[v_nxt] = opt;
                     path_to_go[v_nxt] = vi;
 
-                    if (dp.include_state){
+                    if (dp.include_state)
                         next_state[v_nxt] = dp.next_state_f(xni, vni, i + 1, dp.dt);
-                    }
+
 
                     for (size_t k = 0; k < dwell.size(); ++k) {
                         auto &timer = timers[k];
@@ -84,9 +83,8 @@ void Solver::solve() {
     }
 
     std::vector<std::pair<ProblemConfig::vtype, int>> keys;
-    for (const ProblemConfig::vtype& val: dp.v_feasible[0]) {
+    for (const ProblemConfig::vtype &val: dp.v_feasible[0])
         keys.emplace_back(val, N - 1);
-    }
 
     std::vector<double> cost_end{INFTY};
     ProblemConfig::vtype v_end{0};
@@ -108,14 +106,18 @@ void Solver::solve() {
 
     for (auto i = N - 1; i > 0; --i) {
         optimum_path.emplace(optimum_path.begin(), path_to_go[{optimum_path[0], i}]);
-        if (dp.include_state) {
+        if (dp.include_state)
             optimum_state.emplace(optimum_state.begin(), next_state[{optimum_path[0], i}]);
-        }
     }
 
     solution.optimum_path = optimum_path;
     solution.f = cost_end.at(0);
     solution.success = (solution.f < INFTY.at(0));
+    if (solution.success)
+        Log(INFO) << "Solved.";
+    else
+        Log(INFO) << "Something went wrong!";
+
 
     if (dp.include_state){
         v_ini = {optimum_path.at(0), 0};
@@ -133,9 +135,8 @@ void Solver::set_timers() {
 
     std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash> timer;
     for (std::vector<double> &timer_0: dp.dwell_time_init) {
-        for (const ProblemConfig::vtype& v_0: dp.v_feasible[0]) {
+        for (const ProblemConfig::vtype &v_0: dp.v_feasible[0])
             timer[{v_0, 0}] = timer_0;
-        }
         timers.push_back(timer);
     }
 }
@@ -149,21 +150,21 @@ std::vector<double> Solver::dwell_time(const std::pair<std::vector<int>, std::ve
     }
     std::vector<double> yni = yi;
     for (size_t idx = 0; idx < yi.size(); ++idx) {
-        if (yi[idx] <= 0) {
+        if (yi[idx] <= 0)
             yni[idx] = 0;
-        }
+
         if (vni[idx] != vi[idx]) {
-            if ((yi[idx] > 0) && (vi[idx] == con.first.back())) {
+            if ((yi[idx] > 0) && (vi[idx] == con.first.back()))
                 yni[idx] = DWELL_FLAG;
-            } else {
+            else {
                 auto it = std::find(con.first.begin(), con.first.end(), vni[idx]);
                 if (it != con.first.end()) {
                     size_t vni_idx = std::distance(con.first.begin(), it);
-                    if (vni_idx == 0) {
+                    if (vni_idx == 0)
                         yni[idx] = con.second[idx] + EPSILON;
-                    } else if (con.first[vni_idx - 1] != vi[idx]) {
+                    else if (con.first[vni_idx - 1] != vi[idx])
                         yni[idx] = 0;
-                    }
+
                 }
             }
         }

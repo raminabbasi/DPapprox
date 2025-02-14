@@ -43,16 +43,16 @@ To use DPapprox, we need two ingredients:
 We will refer to the relaxed solution as `v_rel` from now on. When configuring a `ProblemConfig`, the following fields must be set [example]:
 
 * `N` : Number of time discretization nodes (must be equal to `v_rel[0].size()`).
-* `dt`: Fixed time step.
+* `dt`: Fixed time step. 
 * `v_feasible`: A two dimensional vector that indicates possible values of the discrete values, which are vectors themselves (`v_feasible.size()` must be equal to `N`, i.e., for each time node we need to provide a set of possible values)
   *  `{{{1}, {2}} , {{1}, {2}}, ...}` defines  a system with a single discrete input with two values of 1 and 2.
 
 * `running_cost(vi, ri, i, dt)`: A vector function that returns the running cost of approximation as a function of the discrete input `vi`, the relaxed value `ri`, time node `i`, and time step `dt`. 
-  * `|v_i - r_i|` provides Simple Rounding.
+  * `|v_i - r_i|` provides Simple Rounding. *[Default]*
   * `v_i - r_i` provides SumUp Rounding for single or multiple inputs. 
 
 * `sort_key(ci)`: A real function that receives cost of approximation and returns an objective for optimization. 
-  * `ci` is used for Simple Rounding.
+  * `ci` is used for Simple Rounding. *[Default]*
   * `|ci|` is used for SumUp Rounding of single inputs.
   * `||ci||_\infty`  is used for SumUp Rounding with multiple inputs with SOS1 condition. 
 
@@ -68,9 +68,11 @@ DPapprox can also keep track of system states. To do so, we set
 
 * `next_state_f(xi, vi, i, dt)`: A vector function integrator that receives `xi`, discrete input `vi`, time node `i`, and time step `dt` , and provides the next state `xni` . 
   * `f(xi, t_i)*dt + xi` provides the explicit Euler integrator.
+  * `xi`: Zero dynamics. *[Default]*
 * `dynamic_cost(xi, vi, i, dt)`: A vector function that returns a dynamic cost as a function of the state `xi` of the system.
   * `max {0, h(x_i, t_i)}` can be used as a penalty function for a constraint `h(x_i, t_i) <= 0`.
   * Returning `\infty` penalty for a state constraint violation enforces that constraint. 
+  * `{0}`: Zero cost. *[Default]*
 * `include_state`: A boolean to indicate whether DPapprox should include states or not. Default is `false`.
 
 ## Usage
@@ -79,8 +81,6 @@ Below is a minimum working example.
 ```c++
 #include "DPapprox.h"
 #include <vector>
-
-using namespace DPapprox;
 
 int main(){
 
@@ -99,7 +99,14 @@ int main(){
     std::cout << std::endl;
     return 0;
 }
+```
 
+with the output
+```
+Initializing Solver.
+Solving...
+Solved.
+0 1 0 
 ```
 ## Citing
 ```
