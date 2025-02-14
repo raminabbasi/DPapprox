@@ -42,3 +42,8 @@ install(EXPORT DPapproxConfig
         NAMESPACE DPapprox::
         DESTINATION ${CMAKE_INSTALL_DATADIR}/DPapprox/cmake
 )
+
+# Add examples directory if it exists
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/CMakeLists.txt")
+    add_subdirectory(examples)
+endif()
