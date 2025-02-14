@@ -26,7 +26,7 @@ void Solver::solve() {
     for (const ProblemConfig::vtype& v_0: dp.v_feasible[0]) {
         v_ini = {v_0, 0};
         cost_to_go[v_ini] = dp.running_cost(v_0, get_column(v_rel, 0), 0, dp.dt);
-        if (dp.is_dynamic_cost) next_state[v_ini] = dp.next_state_f(dp.x0, v_0, 0, dp.dt);
+        if (dp.include_state) next_state[v_ini] = dp.next_state_f(dp.x0, v_0, 0, dp.dt);
     }
 
     for (int i = 0; i < N - 1; ++i) {
@@ -54,7 +54,7 @@ void Solver::solve() {
                     d = INFTY;
                 }
 
-                if (dp.is_dynamic_cost) {
+                if (dp.include_state) {
                     xni = next_state[v_now];
                     p = dp.dynamic_cost(xni, get_column(v_rel, i), i, dp.dt);
                 }
@@ -69,7 +69,7 @@ void Solver::solve() {
                     cost_to_go[v_nxt] = opt;
                     path_to_go[v_nxt] = vi;
 
-                    if (dp.is_dynamic_cost){
+                    if (dp.include_state){
                         next_state[v_nxt] = dp.next_state_f(xni, vni, i + 1, dp.dt);
                     }
 
@@ -108,7 +108,7 @@ void Solver::solve() {
 
     for (auto i = N - 1; i > 0; --i) {
         optimum_path.emplace(optimum_path.begin(), path_to_go[{optimum_path[0], i}]);
-        if (dp.is_dynamic_cost) {
+        if (dp.include_state) {
             optimum_state.emplace(optimum_state.begin(), next_state[{optimum_path[0], i}]);
         }
     }
@@ -117,7 +117,7 @@ void Solver::solve() {
     solution.f = cost_end.at(0);
     solution.success = (solution.f < INFTY.at(0));
 
-    if (dp.is_dynamic_cost){
+    if (dp.include_state){
         v_ini = {optimum_path.at(0), 0};
         optimum_state.emplace(optimum_state.begin(), next_state[v_ini]);
         optimum_state.emplace(optimum_state.begin(), dp.x0);

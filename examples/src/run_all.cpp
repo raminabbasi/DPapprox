@@ -8,10 +8,10 @@ int main() {
     int failed = 0;
     for (std::string& exe : executables) {
 
-        std::string build = "./build/";
-        std::string input = " ./data/" + std::string(exe) + ".csv";
-        std::string sol_v = " ./data/v_" + std::string(exe) + ".csv";
-        std::string sol_x = " ./data/x_" + std::string(exe) + ".csv";
+        std::string build = "./";
+        std::string input = " ../data/" + std::string(exe) + ".csv";
+        std::string sol_v = " ../data/v_" + std::string(exe) + ".csv";
+        std::string sol_x = " ../data/x_" + std::string(exe) + ".csv";
 
         std::string path = build;
         path += exe;

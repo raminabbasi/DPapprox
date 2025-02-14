@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
     config.dt = 0.0005;
     config.running_cost = running_cost;
     config.sort_key = [](const std::vector<double>& x){return std::fabs(x.at(0));};
-    config.is_dynamic_cost = true;
+    config.include_state = true;
     config.dynamic_cost = dynamic_cost;
     config.next_state_f = next_state_f;
     config.x0 = {1.0, 0.0, 1.0};

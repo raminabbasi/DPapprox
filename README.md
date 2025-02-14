@@ -71,7 +71,7 @@ DPapprox can also keep track of system states. To do so, we set
 * `dynamic_cost(xi, vi, i, dt)`: A vector function that returns a dynamic cost as a function of the state `xi` of the system.
   * `max {0, h(x_i, t_i)}` can be used as a penalty function for a constraint `h(x_i, t_i) <= 0`.
   * Returning `\infty` penalty for a state constraint violation enforces that constraint. 
-
+* `i`
 
 ## Citing
 

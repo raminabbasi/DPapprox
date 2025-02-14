@@ -14,7 +14,7 @@ struct ProblemConfig {
 
     std::vector<std::vector<vtype>> v_feasible;
     xtype x0;
-    bool is_dynamic_cost{false};
+    bool include_state{false};
 
     std::function<std::vector<double>(const vtype&, const std::vector<double>&, int, double)> running_cost = running_cost_0;
     std::function<double(const std::vector<double>&)> sort_key = sort_key_0;
