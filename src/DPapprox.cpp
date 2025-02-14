@@ -91,22 +91,24 @@ namespace DPapprox {
         std::vector<double> cost_end{INFTY};
         ProblemConfig::vtype v_end{0};
 
-        for (const auto &key: keys) {
-            auto it = cost_to_go.find(key);
-            if (it != cost_to_go.end()) {
-                if (dp.sort_key(it->second) < dp.sort_key(cost_end)) {
-                    cost_end = it->second;
-                    v_end = key.first;
+        auto best = std::min_element(
+                keys.begin(), keys.end(),
+                [&](const auto& a, const auto& b) {
+                    return dp.sort_key(cost_to_go[a]) < dp.sort_key(cost_to_go[b]);
                 }
-            }
+        );
+
+        if (best != keys.end()) {
+            cost_end = cost_to_go[*best];
+            v_end = best->first;
         }
 
         std::vector<ProblemConfig::vtype> optimum_path {v_end};
         std::vector<ProblemConfig::xtype> optimum_state {};
         for (auto i = dp.N - 1; i > 0; --i) {
-            optimum_path.insert(optimum_path.begin(), path_to_go[{optimum_path[0], i}]);
+            optimum_path.emplace(optimum_path.begin(), path_to_go[{optimum_path[0], i}]);
             if (dp.is_dynamic_cost) {
-                optimum_state.insert(optimum_state.begin(), next_state[{optimum_path[0], i}]);
+                optimum_state.emplace(optimum_state.begin(), next_state[{optimum_path[0], i}]);
             }
         }
 
@@ -116,16 +118,16 @@ namespace DPapprox {
 
         if (dp.is_dynamic_cost){
             v_ini = {optimum_path.at(0), 0};
-            optimum_state.insert(optimum_state.begin(), next_state[v_ini]);
-            optimum_state.insert(optimum_state.begin(), dp.x0);
+            optimum_state.emplace(optimum_state.begin(), next_state[v_ini]);
+            optimum_state.emplace(optimum_state.begin(), dp.x0);
             solution.optimum_state = optimum_state;
         }
     }
 
     void Solver::set_timers() {
         if (dp.dwell_time_init.empty()) {
-            std::size_t num_cons = dp.dwell_time_cons.size();
-            dp.dwell_time_init.assign(num_cons, std::vector<double>(dp.v_feasible[0][0].size(), 0.0));
+            dp.dwell_time_init.resize(dp.dwell_time_cons.size(),
+                                      std::vector<double>(dp.v_feasible[0][0].size(), 0.0));
         }
 
         std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash> timer;
@@ -137,7 +139,7 @@ namespace DPapprox {
         }
     }
 
-    std::vector<double> Solver::dwell_time(std::pair<std::vector<int>, std::vector<double>> &con,
+    std::vector<double> Solver::dwell_time(const std::pair<std::vector<int>, std::vector<double>> &con,
                                            std::vector<double> yi, const ProblemConfig::vtype& vi,
                                            const ProblemConfig::vtype& vni, int i) const {
 

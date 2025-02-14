@@ -63,8 +63,7 @@ namespace  DPapprox {
         void set_timers();
 
         std::vector<double>
-        dwell_time(std::pair<std::vector<int>,
-                   std::vector<double>> &con,
+        dwell_time(const std::pair<std::vector<int>, std::vector<double>> &con,
                    std::vector<double> yi,
                    const ProblemConfig::vtype& vi,
                    const ProblemConfig::vtype& vni, int i) const;
