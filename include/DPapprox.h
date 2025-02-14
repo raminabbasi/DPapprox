@@ -8,7 +8,7 @@
 #include "config.h"
 #include "io_utils.h"
 #include "vector_ops.h"
-#include "logger.h"
+#include "./logger.h"
 
 namespace  DPapprox {
 
@@ -29,7 +29,6 @@ namespace  DPapprox {
         Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config);
         void solve();
         Solution solution;
-
 
     private:
         ProblemConfig dp;

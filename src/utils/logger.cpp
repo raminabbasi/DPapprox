@@ -1,9 +1,11 @@
 #include "logger.h"
 
-Logger::Logger(LogLevel level) : level(level) {}
+namespace DPapprox {
+    Logger::Logger(LogLevel level) : level(level) {}
 
-Logger::~Logger() {
-    if (level >= LOG_LEVEL) {
-        std::cout << std::endl;
+    Logger::~Logger() {
+        if (level >= LOG_LEVEL) {
+            std::cout << std::endl;
+        }
     }
 }

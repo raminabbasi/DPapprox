@@ -9,6 +9,7 @@ enum LogLevel { DEBUG, INFO, WARNING, ERROR, NONE };
 #define LOG_LEVEL DEBUG  // Default log level (can be overridden at compile time)
 #endif
 
+namespace DPapprox{
 class Logger {
 public:
     Logger(LogLevel level);
@@ -27,5 +28,7 @@ private:
 };
 
 #define Log(level) Logger(level)
+
+}
 
 #endif // LOGGER_H

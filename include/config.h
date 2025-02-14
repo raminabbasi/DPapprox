@@ -16,10 +16,10 @@ struct ProblemConfig {
     xtype x0;
     bool is_dynamic_cost{false};
 
-    std::vector<double> (*running_cost)(const vtype& vi, const std::vector<double>& ri, int i, double dt){running_cost_0};
-    double (*sort_key)(const std::vector<double>& x){sort_key_0};
-    std::vector<double> (*next_state_f)(const xtype& xi, const vtype& vi, int i, double dt){next_state_f_0};
-    std::vector<double> (*dynamic_cost)(const xtype& xi, const std::vector<double>& ri, int i, double dt){dynamic_cost_0};
+    std::function<std::vector<double>(const vtype&, const std::vector<double>&, int, double)> running_cost = running_cost_0;
+    std::function<double(const std::vector<double>&)> sort_key = sort_key_0;
+    std::function<std::vector<double>(const xtype&, const vtype&, int, double)> next_state_f = next_state_f_0;
+    std::function<std::vector<double>(const xtype&, const std::vector<double>&, int, double)> dynamic_cost = dynamic_cost_0;
 
     std::vector<std::pair<std::vector<int>, std::vector<double>>>dwell_time_cons;
     std::vector<std::vector<double>> dwell_time_init{};
