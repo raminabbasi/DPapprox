@@ -12,62 +12,62 @@
 
 namespace  DPapprox {
 
-    constexpr double ZERO = 1e-9;
-    const std::vector<double> INFTY {1e20};
-    constexpr double DWELL_FLAG = -2;
+constexpr double EPSILON = 1e-9;
+const std::vector<double> INFTY {1e20};
+constexpr double DWELL_FLAG = -2;
 
-    struct Solution {
-        std::vector<ProblemConfig::vtype> optimum_path;
-        std::vector<ProblemConfig::xtype> optimum_state;
-        double f;
-        bool success;
-    };
+struct Solution {
+    std::vector<ProblemConfig::vtype> optimum_path;
+    std::vector<ProblemConfig::xtype> optimum_state;
+    double f;
+    bool success;
+};
 
-    class Solver {
+class Solver {
 
-    public:
-        Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config);
-        void solve();
-        Solution solution;
+public:
+    Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config);
+    void solve();
+    Solution solution;
+
+private:
+    ProblemConfig dp;
+    std::vector<std::vector<double>> v_rel;
+
+    struct pair_hash {
+        template<class T1, class T2>
+        std::size_t operator()(const std::pair<T1, T2>& p) const {
+            return hash_vector(p.first) ^ std::hash<T2>()(p.second);
+        }
 
     private:
-        ProblemConfig dp;
-        std::vector<std::vector<double>> v_rel;
-
-        struct pair_hash {
-            template<class T1, class T2>
-            std::size_t operator()(const std::pair<T1, T2>& p) const {
-                return hash_vector(p.first) ^ std::hash<T2>()(p.second);
+        static std::size_t hash_vector(const std::vector<double>& v) {
+            std::size_t seed = v.size();
+            for (double num : v) {
+                seed ^= std::hash<double>()(num) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
             }
-
-        private:
-            static std::size_t hash_vector(const std::vector<double>& v) {
-                std::size_t seed = v.size();
-                for (double num : v) {
-                    seed ^= std::hash<double>()(num) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-                }
-                return seed;
-            }
-        };
-
-        // Define type alias for readability
-        using KeyType = std::pair<ProblemConfig::vtype, int>;
-        using CostMap = std::unordered_map<KeyType, std::vector<double>, pair_hash>;
-        using PathMap = std::unordered_map<KeyType, ProblemConfig::vtype, pair_hash>;
-
-        std::vector<CostMap> timers;
-        CostMap cost_to_go;
-        PathMap path_to_go;
-        PathMap next_state;
-
-        void set_timers();
-
-        std::vector<double>
-        dwell_time(const std::pair<std::vector<int>, std::vector<double>> &con,
-                   std::vector<double> yi,
-                   const ProblemConfig::vtype& vi,
-                   const ProblemConfig::vtype& vni, int i) const;
+            return seed;
+        }
     };
+
+    // Define type alias for readability
+    using KeyType = std::pair<ProblemConfig::vtype, int>;
+    using CostMap = std::unordered_map<KeyType, std::vector<double>, pair_hash>;
+    using PathMap = std::unordered_map<KeyType, ProblemConfig::vtype, pair_hash>;
+
+    std::vector<CostMap> timers;
+    CostMap cost_to_go;
+    PathMap path_to_go;
+    PathMap next_state;
+
+    void set_timers();
+
+    std::vector<double>
+    dwell_time(const std::pair<std::vector<int>, std::vector<double>> &con,
+               std::vector<double> yi,
+               const ProblemConfig::vtype& vi,
+               const ProblemConfig::vtype& vni, int i) const;
+};
 
 }
 #endif // DPAPPROX_H
