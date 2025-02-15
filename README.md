@@ -1,7 +1,9 @@
 # DPapprox
 
-Dynamic Programming-inspired algorithm for approximation of discrete inputs based on the continuous relaxed solution to a Mixed-Integer Optimal Control Problem (MIOCP). It is able to produce different approximation strategies through definition of its cost-to-go. General dwell time constraints can be included as well.
-
+DPApprox is a dynamic programming-inspired algorithm for approximating discrete inputs based 
+on the continuous relaxation of a Mixed-Integer Optimal Control Problem (MIOCP). 
+It supports customizable approximation strategies through flexible cost-to-go definitions 
+and handles general dwell time constraints.
 
 ## Building DPapprox
 
@@ -26,12 +28,13 @@ mkdir build && cd build
 cmake ..
 make
 ```
+
 ### Running examples
 Each program comes with its own data (relaxed solution) in the `data` folder. To run `trj` example
 ```
-./trj ../data/trj
+./trj ../data/trj [<output>]
 ```
-The results are also saved in the `data` folder. 
+If you wish to save the results, specify an `<output>` file  
 ## Docs
 
 To use DPapprox, we need two ingredients:
@@ -66,6 +69,7 @@ We will refer to the relaxed solution as `v_rel` from now on. When configuring a
 ### ProblemConfig (experimental)
 DPapprox can also keep track of system states. To do so, we set
 
+* `include_state`: A boolean to indicate whether DPapprox should include states or not. Default is `false`.
 * `next_state_f(xi, vi, i, dt)`: A vector function integrator that receives `xi`, discrete input `vi`, time node `i`, and time step `dt` , and provides the next state `xni` . 
   * `f(xi, t_i)*dt + xi` provides the explicit Euler integrator.
   * `xi`: Zero dynamics. *[Default]*
@@ -73,7 +77,6 @@ DPapprox can also keep track of system states. To do so, we set
   * `max {0, h(x_i, t_i)}` can be used as a penalty function for a constraint `h(x_i, t_i) <= 0`.
   * Returning `\infty` penalty for a state constraint violation enforces that constraint. 
   * `{0}`: Zero cost. *[Default]*
-* `include_state`: A boolean to indicate whether DPapprox should include states or not. Default is `false`.
 
 ## Usage
 Below is a minimum working example.
