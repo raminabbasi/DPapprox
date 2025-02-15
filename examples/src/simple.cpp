@@ -7,14 +7,13 @@
 using namespace DPapprox;
 
 double sort_key(const std::vector<double>& x) {
-    if (x.empty()) return 0.0; // Handle empty vector case
+    if (x.empty()) return 0.0;
 
-    // Get the element with the largest absolute value
     double max_value = *std::max_element(x.begin(), x.end(), [](double a, double b) {
         return std::abs(a) < std::abs(b);
     });
 
-    return std::abs(max_value);  // Ensure the output is non-negative
+    return std::abs(max_value);
 }
 
 std::vector<double> running_cost(const ProblemConfig::vtype& vi, const std::vector<double>& ri, int i, double dt){

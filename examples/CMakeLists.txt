@@ -19,6 +19,7 @@ function(add_problem_executable name)
 endfunction()
 
 add_problem_executable(mwe)
+add_problem_executable(matrix)
 add_problem_executable(trj)
 add_problem_executable(simple)
 add_problem_executable(dtd)
