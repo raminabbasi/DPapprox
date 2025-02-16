@@ -13,13 +13,13 @@ void write_csv(const std::string& filename, const std::vector<ProblemConfig::dis
 
     for (const ProblemConfig::disc_vector& row : data) {
         for (size_t i = 0; i < row.size(); ++i) {
-            file << row[i];  // Write value
+            file << row[i];  
 
-            if (i < row.size() - 1) {  // Add comma only between elements, not at the end
+            if (i < row.size() - 1) {  
                 file << ",";
             }
         }
-        file << "\n";  // New line after each row
+        file << "\n";  
     }
 
     file.close();
@@ -37,16 +37,16 @@ std::vector<std::vector<double>> read_csv(const std::string& filename) {
     }
 
     std::string line;
-    while (std::getline(file, line)) {  // Read each line (row)
+    while (std::getline(file, line)) {  
         std::vector<double> row;
         std::stringstream ss(line);
         std::string value;
 
-        while (std::getline(ss, value, ',')) {  // Read each column (value)
+        while (std::getline(ss, value, ',')) {  
             row.push_back(std::stod(value));
         }
 
-        data.push_back(row);  // Store the row in data
+        data.push_back(row);  
     }
 
     file.close();

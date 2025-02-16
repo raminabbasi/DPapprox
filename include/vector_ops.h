@@ -10,4 +10,4 @@ namespace DPapprox {
     std::vector<double> operator-(const ProblemConfig::disc_vector&, const std::vector<double>&);
     std::vector<double> operator*(const std::vector<double>&, double);
 }
-#endif //DPAPPROX_VECTOR_OPS_H
+#endif 

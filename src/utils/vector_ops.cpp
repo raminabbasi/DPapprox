@@ -2,24 +2,24 @@
 #include <stdexcept>
 
 namespace DPapprox {
-    // Overload + for vector addition with broadcasting
+    
     std::vector<double> operator+(const std::vector<double> &c, const std::vector<double> &d) {
         if (c.size() == d.size()) {
-            // Case 1: Element-wise addition (same size)
+            
             std::vector<double> result(c.size());
             for (size_t i = 0; i < c.size(); ++i) {
                 result[i] = c[i] + d[i];
             }
             return result;
         } else if (c.size() == 1) {
-            // Case 2: Broadcast c (single element) over d
+            
             std::vector<double> result(d.size());
             for (size_t i = 0; i < d.size(); ++i) {
                 result[i] = c[0] + d[i];
             }
             return result;
         } else if (d.size() == 1) {
-            // Case 3: Broadcast d (single element) over c
+            
             std::vector<double> result(c.size());
             for (size_t i = 0; i < c.size(); ++i) {
                 result[i] = c[i] + d[0];
@@ -30,7 +30,7 @@ namespace DPapprox {
         }
     }
 
-    // Overload `operator-` for `disc_vector - std::vector<double>`
+    
     std::vector<double> operator-(const ProblemConfig::disc_vector &a, const std::vector<double>& b) {
         if (a.size() != b.size()) {
             throw std::runtime_error("Vector subtraction error: size mismatch.");
@@ -43,7 +43,7 @@ namespace DPapprox {
         return result;
     }
 
-    // Overload `operator*` for `std::vector<double> * double`
+    
     std::vector<double> operator*(const std::vector<double> &vec, double scalar) {
         std::vector<double> result(vec.size());
         for (size_t i = 0; i < vec.size(); ++i) {

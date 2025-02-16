@@ -35,15 +35,10 @@ private:
     ProblemConfig dp;
     std::vector<std::vector<double>> v_rel;
 
-    // Define type alias for readability
-    using KeyType = std::pair<ProblemConfig::disc_vector, int>;
-    using CostMap = std::unordered_map<KeyType, std::vector<double> , ProblemConfig::pair_hash>;
-    using PathMap = std::unordered_map<KeyType, ProblemConfig::disc_vector, ProblemConfig::pair_hash>;
-
-    std::vector<CostMap> timers;
-    CostMap cost_to_go;
-    PathMap path_to_go;
-    PathMap next_state;
+    std::vector<ProblemConfig::CostMap> timers;
+    ProblemConfig::CostMap cost_to_go;
+    ProblemConfig::PathMap path_to_go;
+    ProblemConfig::PathMap next_state;
 
     void set_timers();
 
@@ -55,4 +50,4 @@ private:
 };
 
 }
-#endif // DPAPPROX_H
+#endif 
