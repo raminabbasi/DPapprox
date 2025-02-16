@@ -6,7 +6,7 @@
 
 using namespace DPapprox;
 
-std::vector<double> running_cost(const ProblemConfig::vtype& vi, const std::vector<double>& ri, int i, double dt){
+std::vector<double> stage_cost(const ProblemConfig::disc_vector& vi, const std::vector<double>& ri, int i, double dt){
     return {(vi - ri) * dt};
 }
 
@@ -22,8 +22,8 @@ int main(int argc, char* argv[]) {
     config.N = 500;
     config.v_feasible.assign(config.N, {{1}, {0}, {-1}});
     config.dt = 0.02;
-    config.running_cost = running_cost;
-    config.sort_key = [](const std::vector<double>& x){return std::fabs(x.at(0));};
+    config.stage_cost = stage_cost;
+    config.objective = [](const std::vector<double>& x){return std::fabs(x.at(0));};
     double min_dwell_time = 0.3;
     config.dwell_time_cons = { {{1}, {min_dwell_time}},
                                {{0}, {min_dwell_time}},
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
     auto end = std::chrono::high_resolution_clock::now();
 
     std::cout << "Optimal path: ";
-    for (const ProblemConfig::vtype& v : solver.solution.optimum_path){
+    for (const ProblemConfig::disc_vector& v : solver.solution.optimum_path){
         std::cout << v[0] << " ";
     }
     std::cout << std::endl;

@@ -6,7 +6,7 @@
 
 using namespace DPapprox;
 
-std::vector<double> running_cost(const ProblemConfig::vtype& vi,
+std::vector<double> stage_cost(const ProblemConfig::disc_vector& vi,
                                  const std::vector<double>& ri,
                                  int /*i*/,
                                  double dt){
@@ -20,11 +20,11 @@ float T_max = 3.5;
 float b = 7;
 float C = 0.6;
 
-ProblemConfig::xtype next_state_f(const ProblemConfig::xtype& state,
-                                  const ProblemConfig::vtype& input,
+ProblemConfig::state_vector state_transition(const ProblemConfig::state_vector& state,
+                                  const ProblemConfig::disc_vector& input,
                                   int /*i*/,
                                   double dt){
-    auto f = [&](const ProblemConfig::xtype& s) {
+    auto f = [&](const ProblemConfig::state_vector& s) {
         double r = s.at(0);
         double v = s.at(1);
         double m = s.at(2);
@@ -34,19 +34,19 @@ ProblemConfig::xtype next_state_f(const ProblemConfig::xtype& state,
         double vdot = - 1 / (r * r) + 1 / m * (T_max * u - (A * v * v * exp(-k * (r - r0))));
         double mdot = -b * u;
 
-        return ProblemConfig::xtype{rdot, vdot, mdot};
+        return ProblemConfig::state_vector{rdot, vdot, mdot};
     };
 
-    ProblemConfig::xtype k1 = f(state);
-    ProblemConfig::xtype k2 = f(state + k1 * (dt / 2.0));
-    ProblemConfig::xtype k3 = f(state + k2 * (dt / 2.0));
-    ProblemConfig::xtype k4 = f(state + k3 * dt);
+    ProblemConfig::state_vector k1 = f(state);
+    ProblemConfig::state_vector k2 = f(state + k1 * (dt / 2.0));
+    ProblemConfig::state_vector k3 = f(state + k2 * (dt / 2.0));
+    ProblemConfig::state_vector k4 = f(state + k3 * dt);
 
     return state + (k1 + k2 * 2.0 + k3 * 2.0 + k4) * (dt / 6.0);
 }
 
 
-std::vector<double> dynamic_cost(const ProblemConfig::xtype& xi,
+std::vector<double> state_cost(const ProblemConfig::state_vector& xi,
                                    const std::vector<double>& /*vi*/,
                                    int /*i*/,
                                    double /*dt*/){
@@ -71,11 +71,11 @@ int main(int argc, char* argv[]) {
     config.N = 1000;
     config.v_feasible.assign(config.N, {{0}, {1}});
     config.dt = 0.0005;
-    config.running_cost = running_cost;
-    config.sort_key = [](const std::vector<double>& x){return std::fabs(x.at(0));};
+    config.stage_cost = stage_cost;
+    config.objective = [](const std::vector<double>& x){return std::fabs(x.at(0));};
     config.include_state = true;
-    config.dynamic_cost = dynamic_cost;
-    config.next_state_f = next_state_f;
+    config.state_cost = state_cost;
+    config.state_transition = state_transition;
     config.x0 = {1.0, 0.0, 1.0};
     double min_dwell_time = 0.01;
     config.dwell_time_cons = { {{1}, {min_dwell_time}},
@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
     auto end = std::chrono::high_resolution_clock::now();
 
     std::cout << "Optimal path: ";
-    for (const ProblemConfig::vtype& v : solver.solution.optimum_path){
+    for (const ProblemConfig::disc_vector& v : solver.solution.optimum_path){
         std::cout << v[0] << " ";
     }
     std::cout << std::endl;

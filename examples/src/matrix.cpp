@@ -4,7 +4,7 @@
 
 using namespace DPapprox;
 
-double sort_key(const std::vector<double>& x) {
+double objective(const std::vector<double>& x) {
     if (x.empty()) return 0.0;
 
     double max_value = *std::max_element(x.begin(), x.end(), [](double a, double b) {
@@ -14,24 +14,24 @@ double sort_key(const std::vector<double>& x) {
     return std::abs(max_value);
 }
 
-std::vector<double> running_cost(const ProblemConfig::vtype& vi, const std::vector<double>& ri, int i, double dt){
+std::vector<double> stage_cost(const ProblemConfig::disc_vector& vi, const std::vector<double>& ri, int i, double dt){
     return {(vi - ri) * dt};
 }
 
-std::vector<double> custom_cost(const ProblemConfig::vtype& vni, const std::vector<double>& cost_nxt, const ProblemConfig::vtype& vi,
+std::vector<double> custom_cost(const ProblemConfig::disc_vector& vni, const std::vector<double>& cost_nxt, const ProblemConfig::disc_vector& vi,
                                 const ProblemConfig::CostMap& cost_to_go, const ProblemConfig::PathMap& path_to_go, int i, double dt){
 
 
-    std::pair<ProblemConfig::vtype, int> v_now{vi, i};
+    std::pair<ProblemConfig::disc_vector, int> v_now{vi, i};
     std::vector<double> val = cost_to_go.at(v_now);
 
-    if (sort_key(cost_nxt + cost_to_go.at(v_now)) > sort_key(val)){
+    if (objective(cost_nxt + cost_to_go.at(v_now)) > objective(val)){
         val = cost_nxt + cost_to_go.at(v_now);
     }
 
     for (int j = i - 1; j >= 0; j--){
         v_now = {path_to_go.at(v_now), j};
-        if (sort_key(cost_nxt + cost_to_go.at(v_now)) > sort_key(val)){
+        if (objective(cost_nxt + cost_to_go.at(v_now)) > objective(val)){
             val = cost_nxt + cost_to_go.at(v_now);
         }
     }
@@ -48,8 +48,8 @@ int main(){
     config.N = 4;
     config.dt = 1.0;
     config.v_feasible.assign(config.N, {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}});
-    config.running_cost = running_cost;
-    config.sort_key = sort_key;
+    config.stage_cost = stage_cost;
+    config.objective = objective;
     config.customize = true;
     config.custom_cost = custom_cost;
     config.dwell_time_cons = {{{1}, {1.5, 0.5, 0.5}}};

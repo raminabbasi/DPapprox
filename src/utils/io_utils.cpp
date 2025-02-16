@@ -4,14 +4,14 @@
 #include <sstream>
 
 
-void write_csv(const std::string& filename, const std::vector<ProblemConfig::vtype>& data) {
+void write_csv(const std::string& filename, const std::vector<ProblemConfig::disc_vector>& data) {
     std::ofstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error: Cannot open file " << filename << " for writing." << std::endl;
         return;
     }
 
-    for (const ProblemConfig::vtype& row : data) {
+    for (const ProblemConfig::disc_vector& row : data) {
         for (size_t i = 0; i < row.size(); ++i) {
             file << row[i];  // Write value
 

@@ -17,9 +17,9 @@ const std::vector<double> INFTY {1e20};
 constexpr double DWELL_FLAG = -2;
 
 struct Solution {
-    std::vector<ProblemConfig::vtype> optimum_path;
-    std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double> , ProblemConfig::pair_hash> optimum_cost;
-    std::vector<ProblemConfig::xtype> optimum_state;
+    std::vector<ProblemConfig::disc_vector> optimum_path;
+    std::unordered_map<std::pair<ProblemConfig::disc_vector, int>, std::vector<double> , ProblemConfig::pair_hash> optimum_cost;
+    std::vector<ProblemConfig::state_vector> optimum_state;
     double f;
     bool success;
 };
@@ -36,9 +36,9 @@ private:
     std::vector<std::vector<double>> v_rel;
 
     // Define type alias for readability
-    using KeyType = std::pair<ProblemConfig::vtype, int>;
+    using KeyType = std::pair<ProblemConfig::disc_vector, int>;
     using CostMap = std::unordered_map<KeyType, std::vector<double> , ProblemConfig::pair_hash>;
-    using PathMap = std::unordered_map<KeyType, ProblemConfig::vtype, ProblemConfig::pair_hash>;
+    using PathMap = std::unordered_map<KeyType, ProblemConfig::disc_vector, ProblemConfig::pair_hash>;
 
     std::vector<CostMap> timers;
     CostMap cost_to_go;
@@ -50,8 +50,8 @@ private:
     std::vector<double>
     dwell_time(const std::pair<std::vector<int>, std::vector<double>> &con,
                std::vector<double> yi,
-               const ProblemConfig::vtype& vi,
-               const ProblemConfig::vtype& vni, int i) const;
+               const ProblemConfig::disc_vector& vi,
+               const ProblemConfig::disc_vector& vni, int i) const;
 };
 
 }

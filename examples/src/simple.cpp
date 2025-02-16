@@ -6,7 +6,7 @@
 
 using namespace DPapprox;
 
-double sort_key(const std::vector<double>& x) {
+double objective(const std::vector<double>& x) {
     if (x.empty()) return 0.0;
 
     double max_value = *std::max_element(x.begin(), x.end(), [](double a, double b) {
@@ -16,7 +16,7 @@ double sort_key(const std::vector<double>& x) {
     return std::abs(max_value);
 }
 
-std::vector<double> running_cost(const ProblemConfig::vtype& vi, const std::vector<double>& ri, int i, double dt){
+std::vector<double> stage_cost(const ProblemConfig::disc_vector& vi, const std::vector<double>& ri, int i, double dt){
     return {(vi - ri) * dt};
 }
 
@@ -31,8 +31,8 @@ int main(int argc, char* argv[]) {
     config.N = 500;
     config.v_feasible.assign(config.N, {{1, 0}, {0, 1}});
     config.dt = 0.02;
-    config.running_cost = running_cost;
-    config.sort_key = sort_key;
+    config.stage_cost = stage_cost;
+    config.objective = objective;
     double min_dwell_time = 0.2;
     config.dwell_time_cons = { {{0}, {min_dwell_time, min_dwell_time}},
                                {{1}, {0, 0}}};
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
     auto end = std::chrono::high_resolution_clock::now();
 
     std::cout << "Optimal path: ";
-    for (const ProblemConfig::vtype& v : solver.solution.optimum_path){
+    for (const ProblemConfig::disc_vector& v : solver.solution.optimum_path){
         std::cout << v[0] << " ";
     }
     std::cout << std::endl;

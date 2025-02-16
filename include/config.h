@@ -6,35 +6,35 @@
 #include <cmath>
 
 struct ProblemConfig {
-    using vtype = std::vector<double>;
-    using xtype = std::vector<double>;
+    using disc_vector = std::vector<double>;
+    using state_vector = std::vector<double>;
 
     double dt{1.0};
     int N{1};
 
-    std::vector<std::vector<vtype>> v_feasible;
-    xtype x0;
+    std::vector<std::vector<disc_vector>> v_feasible;
+    state_vector x0;
     bool include_state{false};
     bool customize{false};
 
-    std::function<std::vector<double>(const vtype&, const std::vector<double>&, int, double)> running_cost{running_cost_0};
-    std::function<double(const std::vector<double>&)> sort_key{sort_key_0};
-    std::function<xtype(const xtype&, const vtype&, int, double)> next_state_f{next_state_f_0};
-    std::function<std::vector<double>(const xtype&, const std::vector<double>&, int, double)> dynamic_cost{dynamic_cost_0};
+    std::function<std::vector<double>(const disc_vector&, const std::vector<double>&, int, double)> stage_cost{default_stage_cost};
+    std::function<double(const std::vector<double>&)> objective{default_objective};
+    std::function<state_vector(const state_vector&, const disc_vector&, int, double)> state_transition{default_state_transition};
+    std::function<std::vector<double>(const state_vector&, const std::vector<double>&, int, double)> state_cost{default_state_cost};
 
     std::vector<std::pair<std::vector<int>, std::vector<double>>>dwell_time_cons;
     std::vector<std::vector<double>> dwell_time_init{};
 
-    static std::vector<double> running_cost_0(const vtype& vi, const std::vector<double>& ri, int, double){
+    static std::vector<double> default_stage_cost(const disc_vector& vi, const std::vector<double>& ri, int, double){
         return std::vector<double>{std::abs(vi[0] - ri[0])};
     };
-    static double sort_key_0(const std::vector<double>& x){
+    static double default_objective(const std::vector<double>& x){
         return x.at(0);
     };
-    static std::vector<double> dynamic_cost_0(const xtype& xi, const std::vector<double>&, int, double){
+    static std::vector<double> default_state_cost(const state_vector& xi, const std::vector<double>&, int, double){
         return std::vector<double>{0};
     };
-    static std::vector<double> next_state_f_0(const xtype& xi, const vtype&, int, double){
+    static std::vector<double> default_state_transition(const state_vector& xi, const disc_vector&, int, double){
         return xi;
     };
 
@@ -54,15 +54,15 @@ struct ProblemConfig {
         }
     };
 
-    using KeyType = std::pair<vtype, int>;
+    using KeyType = std::pair<disc_vector, int>;
     using CostMap = std::unordered_map<KeyType, std::vector<double> , pair_hash>;
-    using PathMap = std::unordered_map<KeyType, vtype, pair_hash>;
+    using PathMap = std::unordered_map<KeyType, disc_vector, pair_hash>;
 
-    std::function<std::vector<double>(const vtype&, const vtype&, const std::vector<double>&, const PathMap&,
-                                      const CostMap&, int, double)> custom_cost{custom_cost_0};
+    std::function<std::vector<double>(const disc_vector&, const disc_vector&, const std::vector<double>&, const PathMap&,
+                                      const CostMap&, int, double)> custom_cost{default_custom_cost};
 
-    static std::vector<double> custom_cost_0(const vtype& vni, const std::vector<double>& cost_nxt, const vtype& vi,
-                                             const CostMap& cost_to_go, const PathMap& path_to_go, int i, double dt){
+    static std::vector<double> default_custom_cost(const disc_vector& vni, const std::vector<double>& cost_nxt, const disc_vector& vi,
+                                               const CostMap& cost_to_go, const PathMap& path_to_go, int i, double dt){
         return {0};
     };
 };
