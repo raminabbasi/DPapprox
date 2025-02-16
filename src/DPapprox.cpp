@@ -17,7 +17,7 @@ void Solver::solve() {
     set_timers();
 
     std::pair<ProblemConfig::vtype, int> v_ini, v_now, v_nxt;
-    std::vector<double> opt, c{0}, v{0}, p{0}, d{0}, cost{0};
+    std::vector<double> opt, c{0}, v{0}, p{0}, d{0}, cost_nxt{0}, cost{0};
     ProblemConfig::xtype xni{dp.x0};
     std::vector<std::vector<double>> dwell;
     const int N = dp.N;
@@ -41,7 +41,7 @@ void Solver::solve() {
                 for (size_t k = 0; k < dp.dwell_time_cons.size(); ++k) {
                     auto &con = dp.dwell_time_cons[k];
                     auto &timer = timers[k];
-                    dwell.push_back(dwell_time(con, timer[v_now], vi, vni, i));
+                    dwell.push_back(dwell_time(con, timer.at(v_now), vi, vni, i));
                 }
 
                 bool violate_dwell = std::any_of(dwell.begin(), dwell.end(), [](const std::vector<double> &row) {
@@ -54,13 +54,16 @@ void Solver::solve() {
 
 
                 if (dp.include_state) {
-                    xni = next_state[v_now];
+                    xni = next_state.at(v_now);
                     p = dp.dynamic_cost(xni, get_column(v_rel, i), i, dp.dt);
                 }
 
-                v = cost_to_go[v_now];
-
-                cost = (c + v + d + p);
+                v = cost_to_go.at(v_now);
+                cost_nxt = (c + d + p);
+                if (!dp.customize)
+                    cost = v + cost_nxt;
+                else
+                    cost = dp.custom_cost(vni, cost_nxt, vi, cost_to_go, path_to_go, i, dp.dt);
 
                 if (dp.sort_key(cost) < dp.sort_key(opt)) {
 
@@ -111,7 +114,8 @@ void Solver::solve() {
     }
 
     solution.optimum_path = optimum_path;
-    solution.f = cost_end.at(0);
+    solution.optimum_cost = cost_to_go;
+    solution.f = dp.sort_key(cost_end);
     solution.success = (solution.f < INFTY.at(0));
     if (solution.success)
         Log(INFO) << "Solved.";
@@ -133,7 +137,7 @@ void Solver::set_timers() {
                                   std::vector<double>(dp.v_feasible[0][0].size(), 0.0));
     }
 
-    std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, pair_hash> timer;
+    std::unordered_map<std::pair<ProblemConfig::vtype, int>, std::vector<double>, ProblemConfig::pair_hash> timer;
     for (std::vector<double> &timer_0: dp.dwell_time_init) {
         for (const ProblemConfig::vtype &v_0: dp.v_feasible[0])
             timer[{v_0, 0}] = timer_0;
