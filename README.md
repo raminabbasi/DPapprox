@@ -1,6 +1,6 @@
 # DPapprox
 
-DPApprox is a dynamic programming-inspired algorithm for approximating discrete inputs based on the continuous relaxation of a Mixed-Integer Optimal Control Problem (MIOCP). It supports customizable approximation strategies through flexible cost-to-go definitions and handles general dwell time constraints.
+DPapprox (`DP approximation') is a dynamic programming-inspired algorithm for approximating discrete inputs based on the continuous relaxation of a Mixed-Integer Optimal Control Problem (MIOCP). It supports customizable approximation strategies through flexible cost-to-go definitions and handles general dwell time constraints.
 
 ## Building DPapprox
 
@@ -52,9 +52,9 @@ We will refer to the relaxed solution as `v_rel` from now on. When configuring a
   * `v_i - r_i` provides SumUp Rounding for single or multiple inputs. 
 
 * `objective(ci)`: A real function that receives cost of approximation and returns an objective for optimization. 
-  * `ci` is used for Simple Rounding. *[Default]*
-  * `|ci|` is used for SumUp Rounding of single inputs.
-  * `||ci||_\infty`  is used for SumUp Rounding with multiple inputs with SOS1 condition. 
+  * $c_i$ is used for Simple Rounding. *[Default]*
+  * $|c_i|$ is used for SumUp Rounding of single inputs.
+  * $\|c_i\|_\infty$  is used for SumUp Rounding with multiple inputs with SOS1 condition. 
 
 * `dwell_time_cons`: A two dimensional vector that includes pairs of discrete input values and minimum dwell time for them. 
   * `{{{0}, {0.5, 0.5}} , {{0,1}, {0.2, 0.2}}}` defines two constraints:
@@ -68,7 +68,7 @@ DPapprox can also keep track of system states. To do so, we set
 
 * `include_state`: A boolean to indicate whether DPapprox should include states or not. Default is `false`.
 * `state_transition(xi, vi, i, dt)`: A vector function integrator that receives `xi`, discrete input `vi`, time node `i`, and time step `dt` , and provides the next state `xni` . 
-  * `f(xi, t_i)*dt + xi` provides the explicit Euler integrator.
+  * $f(x_i, t_i) dt + x_i$ provides the explicit Euler integrator.
   * `xi`: Zero dynamics. *[Default]*
 * `state_cost(xi, vi, i, dt)`: A vector function that returns a dynamic cost as a function of the state `xi` of the system.
   * `max {0, h(x_i, t_i)}` can be used as a penalty function for a constraint `h(x_i, t_i) <= 0`.
