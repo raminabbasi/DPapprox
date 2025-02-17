@@ -11,23 +11,19 @@ set(DPAPPROX_SOURCES
         src/utils/logger.cpp
 )
 
-# Create library
 add_library(DPapprox STATIC ${DPAPPROX_SOURCES})
 
-# Public include directory
 target_include_directories(DPapprox PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include> # For installation
 )
 
-# Default to INFO if not set
 if (NOT DEFINED LOG_LEVEL)
     set(LOG_LEVEL INFO)
 endif()
 
 add_compile_definitions(LOG_LEVEL=${LOG_LEVEL})
 
-# Installation rules
 include(GNUInstallDirs)
 
 install(TARGETS DPapprox EXPORT DPapproxConfig
