@@ -13,6 +13,9 @@
 #include <vector>
 #include "config.h"
 
+/*
+ * overloading +, -, * for vectors.
+ */
 
 namespace DPapprox {
     std::vector<double> operator+(const std::vector<double>&, const std::vector<double>&);
