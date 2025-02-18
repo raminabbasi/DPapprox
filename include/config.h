@@ -14,15 +14,40 @@
 #include <array>
 #include <cmath>
 
+/* ProblemConfig defines the problem DPapprox solves:
+ *
+ * disc_vector  : the vector of discrete input.
+ * state_vector : the vector of differential state of the system (used for state_cost, and state_transition).
+ *
+ * x0   : the initial state of the system.
+ * dt   : time discretization step.
+ * N    : number of time discretization nodes.
+ *
+ * v_feasible       : the set of feasible options of [disc_vector] for each time node in [N].
+ * include_state    : a boolean to indicate whether system states should be propagated or not.
+ * customize        : a boolean to indicate whether a [custom_cost] is defined.
+ *
+ * stage_cost       : the stage or running cost of discrete approximation.
+ * objective        : the function that receives the approximation cost and returns the objective function to be optimized.
+ * state_transition : a function that transitions the system state from previous state to the next.
+ * state_cost       : the cost of system states. useful for enforcing state constraints.
+ * custom_cost      : the function that takes all the information about the optimum path (cost_to_go) and (path_to_go)
+ *                    to allow the user full control over the approximation cost.
+ *
+ * dwell_time_cons  : a vector that defines the minimum dwell time constraints.
+ * dwell_time_init  : a vector that defines the initial value of timers for the minimum dwell time constraints.
+ */
+
 struct ProblemConfig {
     using disc_vector = std::vector<double>;
     using state_vector = std::vector<double>;
 
+    state_vector x0;
     double dt{1.0};
     int N{1};
 
     std::vector<std::vector<disc_vector>> v_feasible;
-    state_vector x0;
+
     bool include_state{false};
     bool customize{false};
 
