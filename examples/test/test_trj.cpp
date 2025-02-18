@@ -1,7 +1,7 @@
 // Test trj example
 
 #include <gtest/gtest.h>
-#include "../include/DPapprox.h"
+#include "DPapprox.h"
 
 namespace TRJ {
     using namespace DPapprox;
@@ -14,8 +14,8 @@ namespace TRJ {
 TEST(example_results_test, trj) {
 
 // Load data
-std::string filename = "../examples/data/trj.csv";
-std::string solution = "../examples/data/sol_trj.csv";
+std::string filename = "../data/trj.csv";
+std::string solution = "../data/sol_trj.csv";
 std::vector<std::vector<double>> v_rel = read_csv(filename);
 std::vector<ProblemConfig::disc_vector> v_sol = read_csv(solution);
 

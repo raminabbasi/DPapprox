@@ -1,7 +1,7 @@
 // Test simple example
 
 #include <gtest/gtest.h>
-#include "../include/DPapprox.h"
+#include "DPapprox.h"
 
 namespace RCK {
     using namespace DPapprox;
@@ -13,8 +13,8 @@ namespace RCK {
 TEST(example_results_test, rck) {
 
 // Load data
-    std::string filename = "../examples/data/rck.csv";
-    std::string solution = "../examples/data/sol_rck.csv";
+    std::string filename = "../data/rck.csv";
+    std::string solution = "../data/sol_rck.csv";
     std::vector<std::vector<double>> v_rel = read_csv(filename);
     std::vector<ProblemConfig::disc_vector> v_sol = read_csv(solution);
 

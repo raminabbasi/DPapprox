@@ -1,7 +1,7 @@
 // Test simple example
 
 #include <gtest/gtest.h>
-#include "../include/DPapprox.h"
+#include "DPapprox.h"
 
 TEST(example_results_test, mwe) {
 
