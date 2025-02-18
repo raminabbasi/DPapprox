@@ -29,11 +29,11 @@ float T_max = 3.5;
 float b = 7;
 float C = 0.6;
 
-ProblemConfig::state_vector state_transition(const ProblemConfig::state_vector& state,
+ProblemConfig::traj_vector state_transition(const ProblemConfig::traj_vector& state,
                                   const ProblemConfig::disc_vector& input,
                                   int /*i*/,
                                   double dt){
-    auto f = [&](const ProblemConfig::state_vector& s) {
+    auto f = [&](const ProblemConfig::traj_vector& s) {
         double r = s.at(0);
         double v = s.at(1);
         double m = s.at(2);
@@ -43,19 +43,19 @@ ProblemConfig::state_vector state_transition(const ProblemConfig::state_vector& 
         double vdot = - 1 / (r * r) + 1 / m * (T_max * u - (A * v * v * exp(-k * (r - r0))));
         double mdot = -b * u;
 
-        return ProblemConfig::state_vector{rdot, vdot, mdot};
+        return ProblemConfig::traj_vector{rdot, vdot, mdot};
     };
 
-    ProblemConfig::state_vector k1 = f(state);
-    ProblemConfig::state_vector k2 = f(state + k1 * (dt / 2.0));
-    ProblemConfig::state_vector k3 = f(state + k2 * (dt / 2.0));
-    ProblemConfig::state_vector k4 = f(state + k3 * dt);
+    ProblemConfig::traj_vector k1 = f(state);
+    ProblemConfig::traj_vector k2 = f(state + k1 * (dt / 2.0));
+    ProblemConfig::traj_vector k3 = f(state + k2 * (dt / 2.0));
+    ProblemConfig::traj_vector k4 = f(state + k3 * dt);
 
     return state + (k1 + k2 * 2.0 + k3 * 2.0 + k4) * (dt / 6.0);
 }
 
 
-std::vector<double> state_cost(const ProblemConfig::state_vector& xi,
+std::vector<double> state_cost(const ProblemConfig::traj_vector& xi,
                                    const std::vector<double>& /*vi*/,
                                    int /*i*/,
                                    double /*dt*/){
@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
     }
     if (argc > 3){
         DPapprox::Log(INFO) << "printing state into output";
-        write_csv(argv[3], solver.solution.state_to_go);
+        write_csv(argv[3], solver.solution.optimum_traj);
     }
     std::cout << "\nFinal cost: " << solver.solution.objective << std::endl;
     std::cout << "Success: " << solver.solution.success << std::endl;

@@ -27,7 +27,7 @@ void Solver::solve() {
 
     std::pair<ProblemConfig::disc_vector, int> v_ini, v_now, v_nxt;
     std::vector<double> opt, c{0}, v{0}, p{0}, d{0}, cost_nxt{0}, cost{0};
-    ProblemConfig::state_vector xni{dp.x0};
+    ProblemConfig::traj_vector xni{dp.x0};
     std::vector<std::vector<double>> dwell;
     const int N = dp.N;
 
@@ -114,15 +114,15 @@ void Solver::solve() {
     }
 
     std::vector<ProblemConfig::disc_vector> optimum_path {v_end};
-    std::vector<ProblemConfig::state_vector> state_to_go {};
+    std::vector<ProblemConfig::traj_vector> optimum_traj {};
 
     optimum_path.reserve(N + 1);
-    state_to_go.reserve(N + 1);
+    optimum_traj.reserve(N + 1);
 
     for (auto i = N - 1; i > 0; --i) {
         optimum_path.emplace(optimum_path.begin(), path_to_go[{optimum_path[0], i}]);
         if (dp.include_state)
-            state_to_go.emplace(state_to_go.begin(), next_state[{optimum_path[0], i}]);
+            optimum_traj.emplace(optimum_traj.begin(), next_state[{optimum_path[0], i}]);
     }
 
     solution.optimum_path = optimum_path;
@@ -137,9 +137,9 @@ void Solver::solve() {
 
     if (dp.include_state){
         v_ini = {optimum_path.at(0), 0};
-        state_to_go.emplace(state_to_go.begin(), next_state[v_ini]);
-        state_to_go.emplace(state_to_go.begin(), dp.x0);
-        solution.state_to_go = state_to_go;
+        optimum_traj.emplace(optimum_traj.begin(), next_state[v_ini]);
+        optimum_traj.emplace(optimum_traj.begin(), dp.x0);
+        solution.optimum_traj = optimum_traj;
     }
 }
 
