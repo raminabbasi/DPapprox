@@ -75,7 +75,7 @@ int main(){
         std::cout << std::endl;
     }
 
-    std::cout << "\nFinal cost: " << solver.solution.f << std::endl;
+    std::cout << "\nFinal cost: " << solver.solution.objective << std::endl;
     std::cout << "Success: " << solver.solution.success << std::endl;
     std::cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::microseconds > (end - start).count()<< " microseconds\n";
     return 0;

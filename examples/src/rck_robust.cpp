@@ -108,9 +108,9 @@ int main(int argc, char* argv[]) {
     }
     if (argc > 3){
         DPapprox::Log(INFO) << "printing state into output";
-        write_csv(argv[3], solver.solution.optimum_state);
+        write_csv(argv[3], solver.solution.state_to_go);
     }
-    std::cout << "\nFinal cost: " << solver.solution.f << std::endl;
+    std::cout << "\nFinal cost: " << solver.solution.objective << std::endl;
     std::cout << "Success: " << solver.solution.success << std::endl;
     std::cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::microseconds > (end - start).count()<< " microseconds\n";
 

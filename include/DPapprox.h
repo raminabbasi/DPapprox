@@ -21,17 +21,52 @@
 
 namespace  DPapprox {
 
+/*
+ * Global parameters for Solver
+ * EPSILON  : epsilon is used to make sure dwell times always round up to the closest next time node.
+ * INFTY    : defines the infinity penalty value used for violation of constraints.
+ * DWELL_FLAG : is used for detecting a dwell time violation.
+ */
+
 constexpr double EPSILON = 1e-9;
 const std::vector<double> INFTY {1e20};
 constexpr double DWELL_FLAG = -2;
 
+/*
+ * Solution structure includes the following:
+ * optimum_path : the optimum path to go from the final point to the beginning, i.e. the optimal discrete approximation.
+ * state_to_go  : the map of state to go, which provides the next [state_vector] to go at each pair of <disc_vector, i>.
+ * cost         : the optimum approximation cost for the optimum path.
+ * objective    : the optimum objective for the optimum path.
+ * success      : a boolean that is true if objective is less than [INFTY].
+ */
+
 struct Solution {
     std::vector<ProblemConfig::disc_vector> optimum_path;
-    std::unordered_map<std::pair<ProblemConfig::disc_vector, int>, std::vector<double> , ProblemConfig::pair_hash> optimum_cost;
-    std::vector<ProblemConfig::state_vector> optimum_state;
-    double f;
+    std::vector<ProblemConfig::state_vector> state_to_go;
+    std::vector<double> cost;
+    double objective;
     bool success;
 };
+
+/*
+ * Solver class that receives the relaxed solution [v_rel] and an approximation problem [ProblemConfig] and solves
+ * the approximation problem using DP algorithm.
+ *
+ * Solver() : constructs the Solver, by receiving a [v_rel] and a [ProblemConfig].
+ * solve()  : solves the discrete approximation problem.
+ * solution : records the solution based on [Solution] structure.
+ *
+ * dp   : the problem to be solved using DP algorithm.
+ * v_rel: the relaxed solution.
+ * timers       : timers variables that are run along the optimum paths to detect dwell time constraint violation.
+ * cost_to_go   : the discrete approximation cost to go. It provides the cost to go for each pair of <disc_vector, i>.
+ * path_to_go   : the discrete approximation path to go. It provides the [disc_vector] to go for each pair of <disc_vector, i>.
+ * next_state   : specifies the next [state_vector] to go for each pain of <disc_vector, i>.
+ *
+ * set_timers   : initializes the timers for dwell time constraints.
+ * dwell_time   : it checks the optimum paths for violating the dwell time constraints.
+ */
 
 class Solver {
 
