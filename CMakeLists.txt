@@ -49,6 +49,7 @@ add_executable(run_test
         test/test_dtd.cpp
         test/test_rck.cpp
         test/test_rck_robust.cpp
+        test/test_matrix.cpp
 )
 
 target_link_libraries(run_test ${GTEST_LIBRARIES} GTest::gtest GTest::gtest_main pthread DPapprox)
