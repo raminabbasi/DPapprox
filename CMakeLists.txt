@@ -45,6 +45,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 add_executable(run_test
         test/test_trj.cpp
+        test/test_simple.cpp
 )
 
 target_link_libraries(run_test ${GTEST_LIBRARIES} GTest::gtest GTest::gtest_main pthread DPapprox)
