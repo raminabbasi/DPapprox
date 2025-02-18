@@ -114,21 +114,21 @@ void Solver::solve() {
     }
 
     std::vector<ProblemConfig::disc_vector> optimum_path {v_end};
-    std::vector<ProblemConfig::state_vector> optimum_state {};
+    std::vector<ProblemConfig::state_vector> state_to_go {};
 
     optimum_path.reserve(N + 1);
-    optimum_state.reserve(N + 1);
+    state_to_go.reserve(N + 1);
 
     for (auto i = N - 1; i > 0; --i) {
         optimum_path.emplace(optimum_path.begin(), path_to_go[{optimum_path[0], i}]);
         if (dp.include_state)
-            optimum_state.emplace(optimum_state.begin(), next_state[{optimum_path[0], i}]);
+            state_to_go.emplace(state_to_go.begin(), next_state[{optimum_path[0], i}]);
     }
 
     solution.optimum_path = optimum_path;
-    solution.optimum_cost = cost_to_go;
-    solution.f = dp.objective(cost_end);
-    solution.success = (solution.f < INFTY.at(0));
+    solution.objective = dp.objective(cost_end);
+    solution.success = (solution.objective < INFTY.at(0));
+    solution.cost = cost_end;
     if (solution.success)
         Log(INFO) << "Solved.";
     else
@@ -137,9 +137,9 @@ void Solver::solve() {
 
     if (dp.include_state){
         v_ini = {optimum_path.at(0), 0};
-        optimum_state.emplace(optimum_state.begin(), next_state[v_ini]);
-        optimum_state.emplace(optimum_state.begin(), dp.x0);
-        solution.optimum_state = optimum_state;
+        state_to_go.emplace(state_to_go.begin(), next_state[v_ini]);
+        state_to_go.emplace(state_to_go.begin(), dp.x0);
+        solution.state_to_go = state_to_go;
     }
 }
 

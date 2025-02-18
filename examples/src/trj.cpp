@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         Log(INFO) << "printing solution into output";
         write_csv(argv[2], solver.solution.optimum_path);
     }
-    std::cout << "\nFinal cost: " << solver.solution.f << std::endl;
+    std::cout << "\nFinal cost: " << solver.solution.objective << std::endl;
     std::cout << "Success: " << solver.solution.success << std::endl;
     std::cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::microseconds > (end - start).count()<< " microseconds\n";
     return 0;

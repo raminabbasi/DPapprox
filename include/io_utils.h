@@ -14,12 +14,18 @@
 #include <string>
 #include "config.h"
 
+/*
+ * utilities for reading and writing csv files.
+ */
 
 std::vector<std::vector<double>> read_csv(const std::string& filename);
 
 
 void write_csv(const std::string& filename, const std::vector<ProblemConfig::disc_vector>& data);
 
+/*
+ * get_column : a utility function to get a column slice out of vectors.
+ */
 
 std::vector<double> get_column(const std::vector<std::vector<double>>& v, size_t col_index);
 #endif 
