@@ -17,7 +17,7 @@
 /* ProblemConfig defines the problem DPapprox solves:
  *
  * disc_vector  : the vector of discrete input.
- * traj_vector : the vector of differential state of the system (used for state_cost, and state_transition).
+ * traj_vector  : the vector of differential state of the system (used for state_cost, and state_transition).
  *
  * x0   : the initial state of the system.
  * dt   : time discretization step.

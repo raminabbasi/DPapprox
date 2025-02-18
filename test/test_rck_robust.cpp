@@ -98,4 +98,15 @@ TEST(example_results_test, rck_robust) {
             EXPECT_DOUBLE_EQ(v[j], w[j]);
         }
     }
+
+    ProblemConfig::traj_vector x;
+    ProblemConfig::traj_vector y;
+    size_t xlen = solver.solution.optimum_traj.size();
+    for (size_t i = 0; i < xlen; ++i){
+        x = solver.solution.optimum_traj.at(i);
+        y = x_sol.at(i);
+        for (size_t j = 0; j < x.size(); ++j) {
+            EXPECT_NEAR(x[j], y[j], 1e-5);
+        }
+    }
 }
