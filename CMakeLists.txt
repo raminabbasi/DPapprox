@@ -39,3 +39,13 @@ install(EXPORT DPapproxConfig
         DESTINATION ${CMAKE_INSTALL_DATADIR}/DPapprox/cmake
 )
 
+# GTest
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+
+add_executable(run_test
+        test/test_trj.cpp
+)
+
+target_link_libraries(run_test ${GTEST_LIBRARIES} GTest::gtest GTest::gtest_main pthread DPapprox)
+
