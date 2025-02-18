@@ -13,7 +13,7 @@
 #include <sstream>
 
 
-void write_csv(const std::string& filename, const std::vector<ProblemConfig::disc_vector>& data) {
+void write_csv(const std::string& filename, const std::vector<std::vector<double>>& data) {
     std::ofstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error: Cannot open file " << filename << " for writing." << std::endl;

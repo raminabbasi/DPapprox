@@ -38,4 +38,3 @@ install(EXPORT DPapproxConfig
         NAMESPACE DPapprox::
         DESTINATION ${CMAKE_INSTALL_DATADIR}/DPapprox/cmake
 )
-

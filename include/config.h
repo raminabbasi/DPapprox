@@ -17,7 +17,7 @@
 /* ProblemConfig defines the problem DPapprox solves:
  *
  * disc_vector  : the vector of discrete input.
- * state_vector : the vector of differential state of the system (used for state_cost, and state_transition).
+ * traj_vector  : the vector of differential state of the system (used for state_cost, and state_transition).
  *
  * x0   : the initial state of the system.
  * dt   : time discretization step.
@@ -40,9 +40,9 @@
 
 struct ProblemConfig {
     using disc_vector = std::vector<double>;
-    using state_vector = std::vector<double>;
+    using traj_vector = std::vector<double>;
 
-    state_vector x0;
+    traj_vector x0;
     double dt{1.0};
     int N{1};
 
@@ -53,8 +53,8 @@ struct ProblemConfig {
 
     std::function<std::vector<double>(const disc_vector&, const std::vector<double>&, int, double)> stage_cost{default_stage_cost};
     std::function<double(const std::vector<double>&)> objective{default_objective};
-    std::function<state_vector(const state_vector&, const disc_vector&, int, double)> state_transition{default_state_transition};
-    std::function<std::vector<double>(const state_vector&, const std::vector<double>&, int, double)> state_cost{default_state_cost};
+    std::function<traj_vector(const traj_vector&, const disc_vector&, int, double)> state_transition{default_state_transition};
+    std::function<std::vector<double>(const traj_vector&, const std::vector<double>&, int, double)> state_cost{default_state_cost};
 
     std::vector<std::pair<std::vector<int>, std::vector<double>>>dwell_time_cons;
     std::vector<std::vector<double>> dwell_time_init{};
@@ -65,10 +65,10 @@ struct ProblemConfig {
     static double default_objective(const std::vector<double>& x){
         return x.at(0);
     };
-    static std::vector<double> default_state_cost(const state_vector& xi, const std::vector<double>&, int, double){
+    static std::vector<double> default_state_cost(const traj_vector& xi, const std::vector<double>&, int, double){
         return std::vector<double>{0};
     };
-    static std::vector<double> default_state_transition(const state_vector& xi, const disc_vector&, int, double){
+    static std::vector<double> default_state_transition(const traj_vector& xi, const disc_vector&, int, double){
         return xi;
     };
 
