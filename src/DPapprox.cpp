@@ -14,7 +14,7 @@ namespace DPapprox {
 
 Solver::Solver(const std::vector<std::vector<double>> &_v_rel, const ProblemConfig &config)
     : _v_rel(_v_rel), _dp(config)
-    {
+{
     DPapprox::Log.log(INFO) << "Initializing Solver." << std::endl;
 
     if (_dp.N != static_cast<int>(_v_rel[0].size()))
@@ -29,6 +29,8 @@ void Solver::solve() {
     std::vector<double> opt, c{0}, v{0}, p{0}, d{0}, cost_nxt{0}, cost{0};
     ProblemConfig::traj_vector xni{_dp.x0};
     std::vector<std::vector<double>> dwell;
+    dwell.resize(_dp.dwell_time_cons.size());
+
     const int N = _dp.N;
 
     for (auto const& v_0: _dp.v_feasible[0]) {
@@ -46,11 +48,8 @@ void Solver::solve() {
             for (auto const& vi: _dp.v_feasible[i]) {
                 v_now = {vi, i};
 
-                dwell.clear();
                 for (size_t k = 0; k < _dp.dwell_time_cons.size(); ++k) {
-                    auto &con = _dp.dwell_time_cons[k];
-                    auto &timer = _timers[k];
-                    dwell.push_back(_dwell_time(con, timer.at(v_now), vi, vni, i));
+                    dwell[k] = _dwell_time(_dp.dwell_time_cons[k], _timers[k].at(v_now), vi, vni, i);
                 }
 
                 bool violate_dwell = std::any_of(dwell.begin(), dwell.end(), [](const std::vector<double> &row) {
@@ -95,6 +94,7 @@ void Solver::solve() {
     }
 
     std::vector<std::pair<ProblemConfig::disc_vector, int>> keys;
+    keys.reserve(_dp.v_feasible[0].size());
     for (const ProblemConfig::disc_vector &val: _dp.v_feasible[0])
         keys.emplace_back(val, N - 1);
 
@@ -150,7 +150,8 @@ void Solver::_set_timers() {
     }
 
     std::unordered_map<std::pair<ProblemConfig::disc_vector, int>, std::vector<double>, ProblemConfig::pair_hash> timer;
-    for (std::vector<double> &timer_0: _dp.dwell_time_init) {
+    _timers.reserve(_dp.dwell_time_init.size());
+    for (const std::vector<double> &timer_0: _dp.dwell_time_init) {
         for (const ProblemConfig::disc_vector &v_0: _dp.v_feasible[0])
             timer[{v_0, 0}] = timer_0;
         _timers.push_back(timer);
@@ -161,9 +162,9 @@ std::vector<double> Solver::_dwell_time(const std::pair<std::vector<int>, std::v
                                        std::vector<double> yi, const ProblemConfig::disc_vector& vi,
                                        const ProblemConfig::disc_vector& vni, int i) const {
 
-    for (double &y: yi) {
-        y -= _dp.dt;
-    }
+    std::transform(yi.begin(), yi.end(), yi.begin(),
+                   [&](double y) { return y - _dp.dt; });
+
     std::vector<double> yni = yi;
     for (size_t idx = 0; idx < yi.size(); ++idx) {
         if (yi[idx] <= 0)
