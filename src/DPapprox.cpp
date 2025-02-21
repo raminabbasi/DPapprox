@@ -23,56 +23,61 @@ Solver::Solver(const std::vector<std::vector<double>> &_v_rel, const ProblemConf
 
 void Solver::solve() {
     DPapprox::Log.log(INFO) << "Solving..." << std::endl;
-    _set_timers();
+    _set_timers(); // initialize timers for dwell time constraints.
 
     std::pair<ProblemConfig::disc_vector, int> v_ini, v_now, v_nxt;
-    std::vector<double> opt, c{0}, v{0}, p{0}, d{0}, cost_nxt{0}, cost{0};
+    std::vector<double> opt, c{0}, V{0}, p{0}, d{0}, cost_nxt{0}, cost{0};
     ProblemConfig::traj_vector xni{_dp.x0};
     std::vector<std::vector<double>> dwell;
     dwell.resize(_dp.dwell_time_cons.size());
 
     const int N = _dp.N;
 
+    // calculate the initial cost to go at v_0.
     for (auto const& v_0: _dp.v_feasible[0]) {
         v_ini = {v_0, 0};
         _cost_to_go[v_ini] = _dp.stage_cost(v_0, get_column(_v_rel, 0), 0, _dp.dt);
         if (_dp.include_state) _next_state[v_ini] = _dp.state_transition(_dp.x0, v_0, 0, _dp.dt);
     }
 
+    // DP has 3 loops: over time discretization nodes (N), feasible v at i + 1, and feasible v at i.
     for (int i = 0; i < N - 1; ++i) {
         for (auto const& vni: _dp.v_feasible[i + 1]) {
-            v_nxt = {vni, i + 1};
+            v_nxt = {vni, i + 1}; // keys used in maps.
 
-            opt = {std::numeric_limits<double>::infinity()};
-            c = _dp.stage_cost(vni, get_column(_v_rel, i+1), i + 1, _dp.dt);
+            opt = {std::numeric_limits<double>::infinity()}; // initialize optimal value at infinity.
+            c = _dp.stage_cost(vni, get_column(_v_rel, i+1), i + 1, _dp.dt); // stage cost at i + 1.
             for (auto const& vi: _dp.v_feasible[i]) {
                 v_now = {vi, i};
 
+                // check for dwell time violations. if there are any DWELL_FLAG is inserted.
                 for (size_t k = 0; k < _dp.dwell_time_cons.size(); ++k) {
                     dwell[k] = _dwell_time(_dp.dwell_time_cons[k], _timers[k].at(v_now), vi, vni, i);
                 }
-
+                // check if there is any DWELL_FLAG
                 bool violate_dwell = std::any_of(dwell.begin(), dwell.end(), [](const std::vector<double> &row) {
                     return std::find(row.begin(), row.end(), DWELL_FLAG) != row.end();
                 });
-
+                // if DWELL_FLAG is found, set d cost to infinity.
                 d = {0};
                 if (violate_dwell)
                     d = INFTY;
 
-
+                // if states are included, calculate state cost p.
                 if (_dp.include_state) {
                     xni = _next_state.at(v_now);
                     p = _dp.state_cost(xni, get_column(_v_rel, i), i, _dp.dt);
                 }
 
-                v = _cost_to_go.at(v_now);
+                V = _cost_to_go.at(v_now); // cost to go from v_i.
                 cost_nxt = (c + d + p);
+                // the total cost is V + cost of the next stage. user can customize the total cost by custom_cost.
                 if (!_dp.customize)
-                    cost = v + cost_nxt;
+                    cost = V + cost_nxt;
                 else
                     cost = _dp.custom_cost(vni, cost_nxt, vi, _cost_to_go, _path_to_go, i, _dp.dt);
 
+                // the minimum objective is selected, and the values are written for cost to go, path to go, and timers.
                 if (_dp.objective(cost) < _dp.objective(opt)) {
 
                     opt = cost;
@@ -81,7 +86,6 @@ void Solver::solve() {
 
                     if (_dp.include_state)
                         _next_state[v_nxt] = _dp.state_transition(xni, vni, i + 1, _dp.dt);
-
 
                     for (size_t k = 0; k < dwell.size(); ++k) {
                         auto &timer = _timers[k];
@@ -93,6 +97,7 @@ void Solver::solve() {
         }
     }
 
+    // get all keys at the end node
     std::vector<std::pair<ProblemConfig::disc_vector, int>> keys;
     keys.reserve(_dp.v_feasible[0].size());
     for (const ProblemConfig::disc_vector &val: _dp.v_feasible[0])
@@ -100,14 +105,13 @@ void Solver::solve() {
 
     std::vector<double> cost_end{INFTY};
     ProblemConfig::disc_vector v_end{0};
-
+    // find the minimum cost to go
     auto best = std::min_element(
             keys.begin(), keys.end(),
             [&](const auto& a, const auto& b) {
                 return _dp.objective(_cost_to_go[a]) < _dp.objective(_cost_to_go[b]);
             }
     );
-
     if (best != keys.end()) {
         cost_end = _cost_to_go[*best];
         v_end = best->first;
@@ -118,13 +122,14 @@ void Solver::solve() {
 
     optimum_path.reserve(N + 1);
     optimum_traj.reserve(N + 1);
-
+    // backward recursion to calculate optimum path and traj
     for (auto i = N - 1; i > 0; --i) {
         optimum_path.emplace(optimum_path.begin(), _path_to_go[{optimum_path[0], i}]);
         if (_dp.include_state)
             optimum_traj.emplace(optimum_traj.begin(), _next_state[{optimum_path[0], i}]);
     }
 
+    // save in solution
     solution.optimum_path = optimum_path;
     solution.objective = _dp.objective(cost_end);
     solution.success = (solution.objective < INFTY.at(0));
