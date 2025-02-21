@@ -4,7 +4,7 @@
 #include "DPapprox.h"
 
 TEST(example_results_test, mwe) {
-
+    using namespace DPapprox;
 // Define Problem
     ProblemConfig config;
 

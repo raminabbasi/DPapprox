@@ -103,11 +103,11 @@ int main(int argc, char* argv[]) {
     }
     std::cout << std::endl;
     if (argc > 2){
-        DPapprox::Log(INFO) << "printing path into output";
+        DPapprox::Log.log(INFO) << "printing path into output";
         write_csv(argv[2], solver.solution.optimum_path);
     }
     if (argc > 3){
-        DPapprox::Log(INFO) << "printing state into output";
+        DPapprox::Log.log(INFO) << "printing state into output";
         write_csv(argv[3], solver.solution.optimum_traj);
     }
     std::cout << "\nFinal cost: " << solver.solution.objective << std::endl;

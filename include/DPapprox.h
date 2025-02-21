@@ -19,7 +19,7 @@
 #include "vector_ops.h"
 #include "./logger.h"
 
-namespace  DPapprox {
+namespace DPapprox {
 
 /*
  * Global parameters for Solver
@@ -76,22 +76,22 @@ public:
     Solution solution;
 
 private:
-    ProblemConfig dp;
-    std::vector<std::vector<double>> v_rel;
+    ProblemConfig _dp;
+    std::vector<std::vector<double>> _v_rel;
 
-    std::vector<ProblemConfig::CostMap> timers;
-    ProblemConfig::CostMap cost_to_go;
-    ProblemConfig::PathMap path_to_go;
-    ProblemConfig::PathMap next_state;
+    std::vector<ProblemConfig::CostMap> _timers;
+    ProblemConfig::CostMap _cost_to_go;
+    ProblemConfig::PathMap _path_to_go;
+    ProblemConfig::PathMap _next_state;
 
-    void set_timers();
+    void _set_timers();
 
     std::vector<double>
-    dwell_time(const std::pair<std::vector<int>, std::vector<double>> &con,
+    _dwell_time(const std::pair<std::vector<int>, std::vector<double>> &con,
                std::vector<double> yi,
                const ProblemConfig::disc_vector& vi,
                const ProblemConfig::disc_vector& vni, int i) const;
 };
 
 }
-#endif 
+#endif

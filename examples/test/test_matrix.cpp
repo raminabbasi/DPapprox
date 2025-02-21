@@ -42,7 +42,7 @@ namespace MATRIX {
     }
 }
 TEST(example_results_test, matrix) {
-
+    using namespace DPapprox;
 // Define Problem
     ProblemConfig config;
     std::vector<std::vector<double>> v_rel{{4.0/8.0, 0.0, 7.0/8.0, 7.0/8.0},

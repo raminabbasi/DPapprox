@@ -11,7 +11,7 @@ namespace RCK {
     }
 }
 TEST(example_results_test, rck) {
-
+    using namespace DPapprox;
 // Load data
     std::string filename = "../data/rck.csv";
     std::string solution = "../data/sol_rck.csv";

@@ -18,8 +18,10 @@
  */
 
 namespace DPapprox {
-    std::vector<double> operator+(const std::vector<double>&, const std::vector<double>&);
-    std::vector<double> operator-(const ProblemConfig::disc_vector&, const std::vector<double>&);
-    std::vector<double> operator*(const std::vector<double>&, double);
+
+std::vector<double> operator+(const std::vector<double>&, const std::vector<double>&);
+std::vector<double> operator-(const ProblemConfig::disc_vector&, const std::vector<double>&);
+std::vector<double> operator*(const std::vector<double>&, double);
+
 }
 #endif 

@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
     }
     std::cout << std::endl;
     if (argc > 2){
-        Log(INFO) << "printing solution into output";
+        DPapprox::Log.log(INFO) << "printing solution into output";
         write_csv(argv[2], solver.solution.optimum_path);
     }
     std::cout << "\nFinal cost: " << solver.solution.objective << std::endl;
