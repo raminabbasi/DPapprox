@@ -12,45 +12,45 @@
 
 namespace DPapprox {
 
-Solver::Solver(const std::vector<std::vector<double>> &v_rel, const ProblemConfig &config)
-    : v_rel(v_rel), dp(config)
+Solver::Solver(const std::vector<std::vector<double>> &_v_rel, const ProblemConfig &config)
+    : _v_rel(_v_rel), _dp(config)
     {
     Log(INFO) << "Initializing Solver.";
 
-    if (dp.N != static_cast<int>(v_rel[0].size()))
-        throw std::runtime_error("Error: N does not match v_rel[0].size().");
+    if (_dp.N != static_cast<int>(_v_rel[0].size()))
+        throw std::runtime_error("Error: N does not match _v_rel[0].size().");
 }
 
 void Solver::solve() {
     Log(INFO) << "Solving...";
-    set_timers();
+    _set_timers();
 
     std::pair<ProblemConfig::disc_vector, int> v_ini, v_now, v_nxt;
     std::vector<double> opt, c{0}, v{0}, p{0}, d{0}, cost_nxt{0}, cost{0};
-    ProblemConfig::traj_vector xni{dp.x0};
+    ProblemConfig::traj_vector xni{_dp.x0};
     std::vector<std::vector<double>> dwell;
-    const int N = dp.N;
+    const int N = _dp.N;
 
-    for (auto const& v_0: dp.v_feasible[0]) {
+    for (auto const& v_0: _dp.v_feasible[0]) {
         v_ini = {v_0, 0};
-        cost_to_go[v_ini] = dp.stage_cost(v_0, get_column(v_rel, 0), 0, dp.dt);
-        if (dp.include_state) next_state[v_ini] = dp.state_transition(dp.x0, v_0, 0, dp.dt);
+        _cost_to_go[v_ini] = _dp.stage_cost(v_0, get_column(_v_rel, 0), 0, _dp.dt);
+        if (_dp.include_state) _next_state[v_ini] = _dp.state_transition(_dp.x0, v_0, 0, _dp.dt);
     }
 
     for (int i = 0; i < N - 1; ++i) {
-        for (auto const& vni: dp.v_feasible[i + 1]) {
+        for (auto const& vni: _dp.v_feasible[i + 1]) {
             v_nxt = {vni, i + 1};
 
             opt = {std::numeric_limits<double>::infinity()};
-            c = dp.stage_cost(vni, get_column(v_rel, i+1), i + 1, dp.dt);
-            for (auto const& vi: dp.v_feasible[i]) {
+            c = _dp.stage_cost(vni, get_column(_v_rel, i+1), i + 1, _dp.dt);
+            for (auto const& vi: _dp.v_feasible[i]) {
                 v_now = {vi, i};
 
                 dwell.clear();
-                for (size_t k = 0; k < dp.dwell_time_cons.size(); ++k) {
-                    auto &con = dp.dwell_time_cons[k];
-                    auto &timer = timers[k];
-                    dwell.push_back(dwell_time(con, timer.at(v_now), vi, vni, i));
+                for (size_t k = 0; k < _dp.dwell_time_cons.size(); ++k) {
+                    auto &con = _dp.dwell_time_cons[k];
+                    auto &timer = _timers[k];
+                    dwell.push_back(_dwell_time(con, timer.at(v_now), vi, vni, i));
                 }
 
                 bool violate_dwell = std::any_of(dwell.begin(), dwell.end(), [](const std::vector<double> &row) {
@@ -62,30 +62,30 @@ void Solver::solve() {
                     d = INFTY;
 
 
-                if (dp.include_state) {
-                    xni = next_state.at(v_now);
-                    p = dp.state_cost(xni, get_column(v_rel, i), i, dp.dt);
+                if (_dp.include_state) {
+                    xni = _next_state.at(v_now);
+                    p = _dp.state_cost(xni, get_column(_v_rel, i), i, _dp.dt);
                 }
 
-                v = cost_to_go.at(v_now);
+                v = _cost_to_go.at(v_now);
                 cost_nxt = (c + d + p);
-                if (!dp.customize)
+                if (!_dp.customize)
                     cost = v + cost_nxt;
                 else
-                    cost = dp.custom_cost(vni, cost_nxt, vi, cost_to_go, path_to_go, i, dp.dt);
+                    cost = _dp.custom_cost(vni, cost_nxt, vi, _cost_to_go, _path_to_go, i, _dp.dt);
 
-                if (dp.objective(cost) < dp.objective(opt)) {
+                if (_dp.objective(cost) < _dp.objective(opt)) {
 
                     opt = cost;
-                    cost_to_go[v_nxt] = opt;
-                    path_to_go[v_nxt] = vi;
+                    _cost_to_go[v_nxt] = opt;
+                    _path_to_go[v_nxt] = vi;
 
-                    if (dp.include_state)
-                        next_state[v_nxt] = dp.state_transition(xni, vni, i + 1, dp.dt);
+                    if (_dp.include_state)
+                        _next_state[v_nxt] = _dp.state_transition(xni, vni, i + 1, _dp.dt);
 
 
                     for (size_t k = 0; k < dwell.size(); ++k) {
-                        auto &timer = timers[k];
+                        auto &timer = _timers[k];
                         auto &dw = dwell[k];
                         timer[v_nxt] = dw;
                     }
@@ -95,7 +95,7 @@ void Solver::solve() {
     }
 
     std::vector<std::pair<ProblemConfig::disc_vector, int>> keys;
-    for (const ProblemConfig::disc_vector &val: dp.v_feasible[0])
+    for (const ProblemConfig::disc_vector &val: _dp.v_feasible[0])
         keys.emplace_back(val, N - 1);
 
     std::vector<double> cost_end{INFTY};
@@ -104,12 +104,12 @@ void Solver::solve() {
     auto best = std::min_element(
             keys.begin(), keys.end(),
             [&](const auto& a, const auto& b) {
-                return dp.objective(cost_to_go[a]) < dp.objective(cost_to_go[b]);
+                return _dp.objective(_cost_to_go[a]) < _dp.objective(_cost_to_go[b]);
             }
     );
 
     if (best != keys.end()) {
-        cost_end = cost_to_go[*best];
+        cost_end = _cost_to_go[*best];
         v_end = best->first;
     }
 
@@ -120,13 +120,13 @@ void Solver::solve() {
     optimum_traj.reserve(N + 1);
 
     for (auto i = N - 1; i > 0; --i) {
-        optimum_path.emplace(optimum_path.begin(), path_to_go[{optimum_path[0], i}]);
-        if (dp.include_state)
-            optimum_traj.emplace(optimum_traj.begin(), next_state[{optimum_path[0], i}]);
+        optimum_path.emplace(optimum_path.begin(), _path_to_go[{optimum_path[0], i}]);
+        if (_dp.include_state)
+            optimum_traj.emplace(optimum_traj.begin(), _next_state[{optimum_path[0], i}]);
     }
 
     solution.optimum_path = optimum_path;
-    solution.objective = dp.objective(cost_end);
+    solution.objective = _dp.objective(cost_end);
     solution.success = (solution.objective < INFTY.at(0));
     solution.cost = cost_end;
     if (solution.success)
@@ -135,34 +135,34 @@ void Solver::solve() {
         Log(INFO) << "Something went wrong!";
 
 
-    if (dp.include_state){
+    if (_dp.include_state){
         v_ini = {optimum_path.at(0), 0};
-        optimum_traj.emplace(optimum_traj.begin(), next_state[v_ini]);
-        optimum_traj.emplace(optimum_traj.begin(), dp.x0);
+        optimum_traj.emplace(optimum_traj.begin(), _next_state[v_ini]);
+        optimum_traj.emplace(optimum_traj.begin(), _dp.x0);
         solution.optimum_traj = optimum_traj;
     }
 }
 
-void Solver::set_timers() {
-    if (dp.dwell_time_init.empty()) {
-        dp.dwell_time_init.resize(dp.dwell_time_cons.size(),
-                                  std::vector<double>(dp.v_feasible[0][0].size(), 0.0));
+void Solver::_set_timers() {
+    if (_dp.dwell_time_init.empty()) {
+        _dp.dwell_time_init.resize(_dp.dwell_time_cons.size(),
+                                  std::vector<double>(_dp.v_feasible[0][0].size(), 0.0));
     }
 
     std::unordered_map<std::pair<ProblemConfig::disc_vector, int>, std::vector<double>, ProblemConfig::pair_hash> timer;
-    for (std::vector<double> &timer_0: dp.dwell_time_init) {
-        for (const ProblemConfig::disc_vector &v_0: dp.v_feasible[0])
+    for (std::vector<double> &timer_0: _dp.dwell_time_init) {
+        for (const ProblemConfig::disc_vector &v_0: _dp.v_feasible[0])
             timer[{v_0, 0}] = timer_0;
-        timers.push_back(timer);
+        _timers.push_back(timer);
     }
 }
 
-std::vector<double> Solver::dwell_time(const std::pair<std::vector<int>, std::vector<double>> &con,
+std::vector<double> Solver::_dwell_time(const std::pair<std::vector<int>, std::vector<double>> &con,
                                        std::vector<double> yi, const ProblemConfig::disc_vector& vi,
                                        const ProblemConfig::disc_vector& vni, int i) const {
 
     for (double &y: yi) {
-        y -= dp.dt;
+        y -= _dp.dt;
     }
     std::vector<double> yni = yi;
     for (size_t idx = 0; idx < yi.size(); ++idx) {
