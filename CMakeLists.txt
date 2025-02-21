@@ -8,7 +8,6 @@ set(DPAPPROX_SOURCES
         src/DPapprox.cpp
         src/utils/io_utils.cpp
         src/utils/vector_ops.cpp
-        src/utils/logger.cpp
 )
 
 add_library(DPapprox SHARED ${DPAPPROX_SOURCES})

@@ -15,14 +15,14 @@ namespace DPapprox {
 Solver::Solver(const std::vector<std::vector<double>> &_v_rel, const ProblemConfig &config)
     : _v_rel(_v_rel), _dp(config)
     {
-    Log(INFO) << "Initializing Solver.";
+    DPapprox::Log.log(INFO) << "Initializing Solver." << std::endl;
 
     if (_dp.N != static_cast<int>(_v_rel[0].size()))
         throw std::runtime_error("Error: N does not match _v_rel[0].size().");
 }
 
 void Solver::solve() {
-    Log(INFO) << "Solving...";
+    DPapprox::Log.log(INFO) << "Solving..." << std::endl;
     _set_timers();
 
     std::pair<ProblemConfig::disc_vector, int> v_ini, v_now, v_nxt;
@@ -130,9 +130,9 @@ void Solver::solve() {
     solution.success = (solution.objective < INFTY.at(0));
     solution.cost = cost_end;
     if (solution.success)
-        Log(INFO) << "Solved.";
+        DPapprox::Log.log(INFO) << "Solved." << std::endl;
     else
-        Log(INFO) << "Something went wrong!";
+        DPapprox::Log.log(INFO) << "Something went wrong!" << std::endl;
 
 
     if (_dp.include_state){

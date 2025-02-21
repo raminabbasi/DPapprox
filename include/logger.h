@@ -12,35 +12,54 @@
 
 #include <iostream>
 
-namespace DPapprox{
-
+namespace DPapprox {
 
 enum LogLevel { DEBUG, INFO, WARNING, ERROR, NONE };
 
-#ifndef LOG_LEVEL
-#define LOG_LEVEL DEBUG
-#endif
-
-
 class Logger {
 public:
-    Logger(LogLevel level);
-    ~Logger();
+    static Logger& instance() {
+        static Logger instance;
+        return instance;
+    }
+
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
+
+    void setThreshold(LogLevel level) {
+        threshold = level;
+    }
+
+    LogLevel getThreshold() const {
+        return threshold;
+    }
+
+    Logger& log(LogLevel level) {
+        currentMsgLevel = level;
+        return *this;
+    }
 
     template <typename T>
     Logger& operator<<(const T& msg) {
-        if (level >= LOG_LEVEL) {
+        if (currentMsgLevel >= threshold) {
             std::cout << msg;
         }
         return *this;
     }
 
+    Logger& operator<<(std::ostream& (*manip)(std::ostream&)) {
+        std::cout << manip;
+        return *this;
+    }
+
 private:
-    LogLevel level;
+    Logger() : threshold(DEBUG), currentMsgLevel(DEBUG) {}
+
+    LogLevel threshold;
+    LogLevel currentMsgLevel;
 };
 
-#define Log(level) Logger(level)
-
+inline Logger& Log = Logger::instance();
 }
 
-#endif 
+#endif
