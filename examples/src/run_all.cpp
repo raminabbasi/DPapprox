@@ -18,9 +18,9 @@ int main() {
     for (std::string& exe : executables) {
 
         std::string build = "./";
-        std::string input = " ../data/" + std::string(exe) + ".csv";
-        std::string sol_v = " ../data/v_" + std::string(exe) + ".csv";
-        std::string sol_x = " ../data/x_" + std::string(exe) + ".csv";
+        std::string input = " ../../examples/data/" + std::string(exe) + ".csv";
+        std::string sol_v = " ../../examples/data/v_" + std::string(exe) + ".csv";
+        std::string sol_x = " ../../examples/data/x_" + std::string(exe) + ".csv";
 
         std::string path = build;
         path += exe;

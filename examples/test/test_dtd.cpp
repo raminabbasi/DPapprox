@@ -32,8 +32,8 @@ namespace DTD {
 TEST(example_results_test, dtd) {
     using namespace DPapprox;
 // Load data
-    std::string filename = "../data/dtd.csv";
-    std::string solution = "../data/sol_dtd.csv";
+    std::string filename = "../../examples/data/dtd.csv";
+    std::string solution = "../../examples/data/sol_dtd.csv";
     std::vector<std::vector<double>> v_rel = read_csv(filename);
     std::vector<ProblemConfig::disc_vector> v_sol = read_csv(solution);
 

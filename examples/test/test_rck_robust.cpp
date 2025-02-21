@@ -63,9 +63,9 @@ namespace RCK_ROBUST {
 TEST(example_results_test, rck_robust) {
     using namespace DPapprox;
 // Load data
-    std::string filename = "../data/rck_robust.csv";
-    std::string solution = "../data/sol_rck_robust.csv";
-    std::string solutionx = "../data/solx_rck_robust.csv";
+    std::string filename = "../../examples/data/rck_robust.csv";
+    std::string solution = "../../examples/data/sol_rck_robust.csv";
+    std::string solutionx = "../../examples/data/solx_rck_robust.csv";
     std::vector<std::vector<double>> v_rel = read_csv(filename);
     std::vector<ProblemConfig::disc_vector> v_sol = read_csv(solution);
     std::vector<ProblemConfig::traj_vector> x_sol = read_csv(solutionx);

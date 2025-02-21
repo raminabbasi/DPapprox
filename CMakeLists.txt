@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 project(DPapprox)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
@@ -37,3 +41,11 @@ install(EXPORT DPapproxConfig
         NAMESPACE DPapprox::
         DESTINATION ${CMAKE_INSTALL_DATADIR}/DPapprox/cmake
 )
+
+option(WITH_EXAMPLES "Build the examples" OFF)
+option(WITH_TESTS "Build tests in examples" OFF)
+
+if (WITH_EXAMPLES)
+    set(WITH_TESTS ${WITH_TESTS} CACHE BOOL "Build tests in examples" FORCE)
+    add_subdirectory(examples)
+endif()
