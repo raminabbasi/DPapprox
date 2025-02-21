@@ -8,30 +8,20 @@ DPapprox (`DP approximation') is a dynamic programming-inspired algorithm for ap
 git clone https://github.com/raminabbasi/DPapprox.git
 cd DPapprox
 mkdir build && cd build
-cmake ..
+cmake .. [-DWITH_EXAMPLES=ON] [-DWITH_TESTS=ON]
 make
 ```
-and if you wish to install DPapprox
+You can use CMake flags `-DWITH_EXAMPLES=ON` to build examples, and if you are building with examples, you can use `-DWITH_TESTS=ON` to add tests for them. If you wish to install DPapprox:
+
 ```
 make install
 ```
-
-## Building Examples
-Examples can be built independently:
-```
-cd ..
-cd examples
-mkdir build && cd build
-cmake ..
-make
-```
-
 ### Running examples
 Each program comes with its own data (relaxed solution) in the `data` folder. To run `trj` example
 ```
-./trj ../data/trj [<output>]
+./trj <path/to/data>/trj.csv [<output>]
 ```
-If you wish to save the results, specify an `<output>` file  
+If you wish to save the results, specify an `<output>` file. 
 ## Docs
 
 To use DPapprox, we need two ingredients:
@@ -71,8 +61,9 @@ DPapprox can also keep track of system states. To do so, we set
   * $f(x_i, t_i) dt + x_i$ provides the explicit Euler integrator.
   * `xi`: Zero dynamics. *[Default]*
 * `state_cost(xi, vi, i, dt)`: A vector function that returns a dynamic cost as a function of the state `xi` of the system.
-  * `max {0, h(x_i, t_i)}` can be used as a penalty function for a constraint `h(x_i, t_i) <= 0`.
+  * `max {0, h(xi, t_i)}` can be used as a penalty function for a constraint `h(xi, t_i) <= 0`.
   * Returning `\infty` penalty for a state constraint violation enforces that constraint. 
+  * `(xi - r_i)**2` penalty can be used for tracking a reference. 
   * `{0}`: Zero cost. *[Default]*
 
 ## Usage
