@@ -3,7 +3,7 @@ project(DPapprox)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1 -march=native -DNDEBUG")
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 set(DPAPPROX_SOURCES
         src/DPapprox.cpp
         src/utils/io_utils.cpp
@@ -11,7 +11,7 @@ set(DPAPPROX_SOURCES
         src/utils/logger.cpp
 )
 
-add_library(DPapprox STATIC ${DPAPPROX_SOURCES})
+add_library(DPapprox SHARED ${DPAPPROX_SOURCES})
 
 target_include_directories(DPapprox PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
