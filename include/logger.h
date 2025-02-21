@@ -12,13 +12,16 @@
 
 #include <iostream>
 
+namespace DPapprox{
+
+
 enum LogLevel { DEBUG, INFO, WARNING, ERROR, NONE };
 
 #ifndef LOG_LEVEL
-#define LOG_LEVEL DEBUG  
+#define LOG_LEVEL DEBUG
 #endif
 
-namespace DPapprox{
+
 class Logger {
 public:
     Logger(LogLevel level);

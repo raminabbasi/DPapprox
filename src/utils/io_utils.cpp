@@ -13,14 +13,14 @@
 #include <sstream>
 
 
-void write_csv(const std::string& filename, const std::vector<std::vector<double>>& data) {
+void DPapprox::write_csv(const std::string& filename, const std::vector<std::vector<double>>& data) {
     std::ofstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error: Cannot open file " << filename << " for writing." << std::endl;
         return;
     }
 
-    for (const ProblemConfig::disc_vector& row : data) {
+    for (const DPapprox::ProblemConfig::disc_vector& row : data) {
         for (size_t i = 0; i < row.size(); ++i) {
             file << row[i];  
 
@@ -36,7 +36,7 @@ void write_csv(const std::string& filename, const std::vector<std::vector<double
 
 
 
-std::vector<std::vector<double>> read_csv(const std::string& filename) {
+std::vector<std::vector<double>> DPapprox::read_csv(const std::string& filename) {
     std::vector<std::vector<double>> data;
     std::ifstream file(filename);
 
@@ -62,7 +62,7 @@ std::vector<std::vector<double>> read_csv(const std::string& filename) {
     return data;
 }
 
-std::vector<double> get_column(const std::vector<std::vector<double>> &v, size_t col_index) {
+std::vector<double> DPapprox::get_column(const std::vector<std::vector<double>> &v, size_t col_index) {
     std::vector<double> column;
     for (const auto& row : v) {
         if (col_index < row.size()) {
