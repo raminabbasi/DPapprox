@@ -99,8 +99,8 @@ void Solver::solve() {
 
     // get all keys at the end node
     std::vector<std::pair<ProblemConfig::disc_vector, int>> keys;
-    keys.reserve(_dp.v_feasible[0].size());
-    for (const ProblemConfig::disc_vector &val: _dp.v_feasible[0])
+    keys.reserve(_dp.v_feasible[N - 1].size());
+    for (const ProblemConfig::disc_vector &val: _dp.v_feasible[N - 1])
         keys.emplace_back(val, N - 1);
 
     std::vector<double> cost_end{INFTY};
