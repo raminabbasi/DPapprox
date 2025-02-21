@@ -61,7 +61,7 @@ namespace RCK_ROBUST {
     }
 }
 TEST(example_results_test, rck_robust) {
-
+    using namespace DPapprox;
 // Load data
     std::string filename = "../data/rck_robust.csv";
     std::string solution = "../data/sol_rck_robust.csv";

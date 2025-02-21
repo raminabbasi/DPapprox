@@ -30,7 +30,7 @@ namespace DTD {
     }
 }
 TEST(example_results_test, dtd) {
-
+    using namespace DPapprox;
 // Load data
     std::string filename = "../data/dtd.csv";
     std::string solution = "../data/sol_dtd.csv";

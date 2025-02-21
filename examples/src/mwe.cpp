@@ -12,7 +12,7 @@
 
 int main(){
 
-    ProblemConfig config;
+    DPapprox::ProblemConfig config;
     std::vector<std::vector<double>> v_rel{{0.2, 0.8, 0.4}};
 
     config.N = 3;

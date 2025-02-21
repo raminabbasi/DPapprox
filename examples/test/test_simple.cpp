@@ -22,7 +22,7 @@ namespace SIMPLE {
     }
 }
 TEST(example_results_test, simple) {
-
+    using namespace DPapprox;
 // Load data
     std::string filename = "../data/simple.csv";
     std::string solution = "../data/sol_simple.csv";
