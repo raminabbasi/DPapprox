@@ -13,7 +13,7 @@
 
 using namespace DPapprox;
 
-double objective(const std::vector<double>& x) {
+double norm(const std::vector<double>& x) {
     if (x.empty()) return 0.0;
 
     double max_value = *std::max_element(x.begin(), x.end(), [](double a, double b) {
@@ -30,22 +30,20 @@ std::vector<double> stage_cost(const ProblemConfig::disc_vector& vi, const std::
 std::vector<double> custom_cost(const ProblemConfig::disc_vector& vni, const std::vector<double>& cost_nxt, const ProblemConfig::disc_vector& vi,
                                 const ProblemConfig::CostMap& cost_to_go, const ProblemConfig::PathMap& path_to_go, int i, double dt){
 
-
     std::pair<ProblemConfig::disc_vector, int> v_now{vi, i};
-    std::vector<double> val = cost_to_go.at(v_now);
+    std::vector<double> V = cost_to_go.at(v_now);
 
-    if (objective(cost_nxt + cost_to_go.at(v_now)) > objective(val)){
-        val = cost_nxt + cost_to_go.at(v_now);
-    }
+    double V_max = (i > 0) ? V.back() : norm(V);
+    if (i == 0)
+        V.push_back(V_max);
 
-    for (int j = i - 1; j >= 0; j--){
-        v_now = {path_to_go.at(v_now), j};
-        if (objective(cost_nxt + cost_to_go.at(v_now)) > objective(val)){
-            val = cost_nxt + cost_to_go.at(v_now);
-        }
-    }
+    std::vector<double> cost(V.begin(), V.end() - 1);
+    std::vector<double> cost_max = cost + cost_nxt;
+    double V_nxt = norm(cost_max);
 
-    return val;
+    cost_max.push_back((V_nxt > V_max) ? V_nxt : V_max);
+
+    return cost_max;
 }
 
 int main(){
@@ -58,7 +56,7 @@ int main(){
     config.dt = 1.0;
     config.v_feasible.assign(config.N, {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}});
     config.stage_cost = stage_cost;
-    config.objective = objective;
+    config.objective = [](const std::vector<double>& x){return x.back();};
     config.customize = true;
     config.custom_cost = custom_cost;
     config.dwell_time_cons = {{{1}, {1.5, 0.5, 0.5}}};
