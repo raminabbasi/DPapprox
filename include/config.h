@@ -101,13 +101,10 @@ struct ProblemConfig {
     using CostMap = std::unordered_map<KeyType, std::vector<double>, pair_hash>;
     using PathMap = std::unordered_map<KeyType, disc_vector, pair_hash>;
 
-    std::function<std::vector<double>(const disc_vector &, const disc_vector &, const std::vector<double> &,
-                                      const PathMap &,
-                                      const CostMap &, int, double)> custom_cost{default_custom_cost};
+    std::function<std::vector<double>(std::vector<double>& V, std::vector<double>& cost_nxt, int i, double dt)> custom_cost{default_custom_cost};
 
     static std::vector<double>
-    default_custom_cost(const disc_vector &vni, const std::vector<double> &cost_nxt, const disc_vector &vi,
-                        const CostMap &cost_to_go, const PathMap &path_to_go, int i, double dt) {
+    default_custom_cost(std::vector<double>& V, std::vector<double>& cost_nxt, int i, double dt) {
         return {0};
     };
 };

@@ -75,8 +75,8 @@ void Solver::solve() {
                 if (!_dp.customize)
                     cost = V + cost_nxt;
                 else
-                    cost = _dp.custom_cost(vni, cost_nxt, vi, _cost_to_go, _path_to_go, i, _dp.dt);
-
+                    cost = _dp.custom_cost(V, cost_nxt, i, _dp.dt);
+				
                 // the minimum objective is selected, and the values are written for cost to go, path to go, and timers.
                 if (_dp.objective(cost) < _dp.objective(opt)) {
 
