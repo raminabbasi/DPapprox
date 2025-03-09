@@ -27,11 +27,7 @@ std::vector<double> stage_cost(const ProblemConfig::disc_vector& vi, const std::
     return {(vi - ri) * dt};
 }
 
-std::vector<double> custom_cost(const ProblemConfig::disc_vector& vni, const std::vector<double>& cost_nxt, const ProblemConfig::disc_vector& vi,
-                                const ProblemConfig::CostMap& cost_to_go, const ProblemConfig::PathMap& path_to_go, int i, double dt){
-
-    std::pair<ProblemConfig::disc_vector, int> v_now{vi, i};
-    std::vector<double> V = cost_to_go.at(v_now);
+std::vector<double> custom_cost(std::vector<double>& V, std::vector<double>& cost_nxt, int i, double dt){
 
     double V_max = (i > 0) ? V.back() : norm(V);
     if (i == 0)
