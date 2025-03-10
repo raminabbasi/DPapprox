@@ -1,5 +1,3 @@
-// Test simple example
-
 #include <gtest/gtest.h>
 #include "DPapprox.h"
 

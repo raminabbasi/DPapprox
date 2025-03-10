@@ -1,5 +1,3 @@
-// Test simple example
-
 #include <gtest/gtest.h>
 #include "DPapprox.h"
 
@@ -35,7 +33,7 @@ namespace MATRIX {
     return cost_max;
 }
 }
-TEST(example_results_test, matrix) {
+TEST(example_results_test, mat) {
     using namespace DPapprox;
 // Define Problem
     ProblemConfig config;
