@@ -9,9 +9,9 @@ function(add_problem_executable name)
 endfunction()
 
 add_problem_executable(mwe)
-add_problem_executable(matrix)
+add_problem_executable(mat)
 add_problem_executable(trj)
-add_problem_executable(simple)
+add_problem_executable(sos)
 add_problem_executable(dtd)
 add_problem_executable(rck)
 add_problem_executable(rck_robust)
@@ -26,11 +26,11 @@ if (WITH_TESTS)
 
     add_executable(run_test
             test/test_trj.cpp
-            test/test_simple.cpp
+            test/test_sos.cpp
             test/test_dtd.cpp
             test/test_rck.cpp
             test/test_rck_robust.cpp
-            test/test_matrix.cpp
+            test/test_mat.cpp
             test/test_mwe.cpp
     )
 

@@ -1,4 +1,4 @@
-// Test simple example
+// Test sos example
 
 #include <gtest/gtest.h>
 #include "DPapprox.h"
@@ -21,11 +21,11 @@ namespace SIMPLE {
         return {(vi - ri) * dt};
     }
 }
-TEST(example_results_test, simple) {
+TEST(example_results_test, sos) {
     using namespace DPapprox;
 // Load data
-    std::string filename = "../../examples/data/simple.csv";
-    std::string solution = "../../examples/data/sol_simple.csv";
+    std::string filename = "../../examples/data/sos.csv";
+    std::string solution = "../../examples/data/sol_sos.csv";
     std::vector<std::vector<double>> v_rel = read_csv(filename);
     std::vector<ProblemConfig::disc_vector> v_sol = read_csv(solution);
 

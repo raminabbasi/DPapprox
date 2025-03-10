@@ -13,7 +13,7 @@
 int main() {
     std::cout << "Running all problem executables...\n";
 
-    std::string executables[] = {"trj", "simple", "dtd", "rck", "rck_robust", "mwe", "matrix"};
+    std::string executables[] = {"trj", "sos", "dtd", "rck", "rck_robust", "mwe", "mat"};
     int failed = 0;
     for (std::string& exe : executables) {
 
