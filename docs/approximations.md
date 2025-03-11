@@ -33,7 +33,7 @@ V_i(v_i) &= V_{i-1}(\pi_i(v_i)) + c_i(v_i), \\
 V_0(v_0) &= c_0(v_0).
 \end{aligned}
 $$
-**Examples:** `rck`, `trj`
+**Examples:** `rck`, `trj`, `lvf`
 
 ### SumUp Rounding ($n_v > 1$)
 
