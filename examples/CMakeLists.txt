@@ -14,6 +14,7 @@ add_problem_executable(trj)
 add_problem_executable(sos)
 add_problem_executable(dtd)
 add_problem_executable(rck)
+add_problem_executable(lvf)
 add_problem_executable(rck_robust)
 add_problem_executable(run_all)
 
@@ -31,6 +32,7 @@ if (WITH_TESTS)
             test/test_rck.cpp
             test/test_rck_robust.cpp
             test/test_mat.cpp
+            test/test_lvf.cpp
             test/test_mwe.cpp
     )
 
